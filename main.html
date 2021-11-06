@@ -3021,7 +3021,7 @@ player = api_get_player_tile_position()
 api_create_obj("workbench", player["x"], player["y"])
 </syntaxhighlight><br/>
       <h2>api_get_property()</h2>
-      <p>This method will get a given property from an instance. You can also use the shorthand "api_gp()" for this method.</p>
+      <p>This method will get a given property from an instance. You can also use the shorthand "api_gp()" for this method.<br/>See [[Instance Properties]] for a full list of all built-in properties for all types of instances.</p>
       {| class="wikitable"
       ! Parameter !! Datatype !! Description 
       |-
@@ -3868,7 +3868,7 @@ highlighted = api_get_highlighted("obj")
 api_set_position(highlighted, random_x, random_y)
 </syntaxhighlight><br/>
       <h2>api_set_property()</h2>
-      <p>This method allows you to set a property on an instance so you can use it later. You can also use the "api_sp()" shorthand.<br/><b>When setting custom properties on menu objects you should add the prop_name to the {{I|i=menu_obj._fields}} list key if you want to keep it persistent when the player saves.</b></p>
+      <p>This method allows you to set a property on an instance so you can use it later. You can also use the "api_sp()" shorthand.<br/><b>When setting custom properties on menu objects you should add the prop_name to the {{I|i=menu_obj._fields}} list key if you want to keep it persistent when the player saves.</b><br/>See [[Instance Properties]] for a full list of all built-in properties for all types of instances.</p>
       {| class="wikitable"
        ! Parameter !! Datatype !! Description 
        |-
