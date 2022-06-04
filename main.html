@@ -136,6 +136,8 @@ __NOTOC__
      |-
      | {{D|i=time}} || Represents the game time
      |-
+     | {{D|i=wall_definition}} Represents a definition for a new wall
+     |-
      | {{D|i=weather}} || Represents the game weather
     |}
     <div class="mw-collapsible mw-collapsed" id="mw-customcollapsible-s2">
@@ -288,7 +290,7 @@ __NOTOC__
       | amount || {{D|i=integer}} || the amount of this item needed for this ingredient
      |}<br/>
      <h2>instance</h2>
-     <p>A generic representation of any instance. All instance types have the same properties, albeit some will be {{D|i=nil}}.</p>
+     <p>A generic representation of any instance. All instance types have the same properties, albeit some will be {{D|i=nil}}. See [[Instance Properties]] for more specific information.</p>
      {| class="wikitable"
       ! Key !! Datatype !! Description 
       |-
@@ -298,18 +300,22 @@ __NOTOC__
       |-
       | y || {{D|i=integer}} || the y position of this inst
       |-
-      | oid || {{D|i=integer}} || the APICO "id" value used with the Dictionary
+      | oid || {{D|i=integer}} || the APICO "id" value used with the Dictionary - will be nil on item/slot instances
       |-
       | sprite_index || {{D|i=integer}} || the sprite image id used for this instance
       |-
       | image_index || {{D|i=integer}} || the sprite image "frame" currently set for this instance
+      |-
+      | image_xscale || {{D|i=integer}} || image xscale used in rendering, i.e. -1 to flip vertically
+      |-
+      | image_yscale || {{D|i=integer}} || image yscale used in rendering, i.e. -1 to flip horizontally
       |-
       | menu_id || {{D|i=integer}} || the menu instance for this instance - will be nil if not a menu object instance
       |-
       | slots || list({{D|i=slot}}) || a list of slot instances - will be nil if not a menu instance
      |}<br/>
      <h2>item_definition</h2>
-     <p>Represents a definition for a new item. Items can be picked up, dropped, used, and crafted with.<br/>A good in-game example of an   item would be Logs</p>
+     <p>Represents a definition for a new item. Items can be picked up, dropped, used, and crafted with.<br/>A good in-game example of an item would be Logs</p>
      {| class="wikitable"
       ! Key !! Datatype !! Description 
       |-
@@ -321,11 +327,11 @@ __NOTOC__
       |-
       | tooltip || {{D|i=string}} || the tooltip message for this item, shown in expanded tooltips
       |-
-      | shop_key || {{D|i=boolean}} || whether this is a "key" item and so cannot be sold
+      | shop_key || {{D|i=boolean}} || [Optional] whether this is a "key" item and so cannot be sold
       |-
-      | shop_buy || {{D|i=boolean}} || the amount this item can be bought for if sold by an NPC
+      | shop_buy || {{D|i=boolean}} || [Optional] the amount this item can be bought for if sold by an NPC
       |-
-      | shop_sell || {{D|i=boolean}} || the amount this item can be sold for at an NPC
+      | shop_sell || {{D|i=boolean}} || [Optional] the amount this item can be sold for at an NPC
       |-
       | machines || list({{D|i=string}}) || [Optional] a list of object oids that this item this can be used in, i.e. {{I|i=["workbench",   "sawmill"]}}, shown in tooltips
       |-
@@ -344,6 +350,8 @@ __NOTOC__
       | obj || {{D|i=string}} || [Optional] if placeable, this specifies the object oid that will be created when the item is used
       |-
       | honeycore || {{D|i=boolean}} || [Optional] if true, this item will be bought + sold for honeycore instead of rubees
+      |-
+      | bee_lore || {{D|i=string}} || [Optional] if set, this will be used as the "lore" in the bee book if this item is a bee's special produce
      |}<br/>
       <h2>layout</h2>
       <p>Represents a layout to use with a menu object's definition. This tells the game where you want the slots in relation to the menu's top left coordinate as well as what can or can't be put in that slot.<br/>Technically this is a list of values, hence the keys below being numbers.</p>
@@ -356,7 +364,7 @@ __NOTOC__
        |-
        | 2 || {{D|i=string}} || [Optional] the type of slot this is, valid options are {{I|i=Input}}, {{I|i=Liquid Input}}, {{I|i=Output}}, {{I|i=Liquid Output}}, or {{I|i=Shop}}. Output slots cannot have items put in them.
        |-
-       | 3 || list({{D|i=string}}) || [Optional] if the type of slot is {{I|i=Input}} or {{I|i=Liquid Input}}, this let's you define the items that are allowed in them, i.e. {{I|i=["log", "sticks1"]}}
+       | 3 || list({{D|i=string}}) || [Optional] if the type of slot is {{I|i=Input}} or {{I|i=Liquid Input}}, this let's you define the items that are allowed in them, i.e. {{I|i=["log", "sticks1"]}}. You can also use some "specials" that allow any items of that same oid, namely: "seedX", "flowerX", "trackX", "dyeX", as well as "customX" (see {{F|i=api_define_validation_icon()}})
       |}<br/>
       <h2>menu_definition</h2>
       <p>Represents a definition for a new menu object. Menu Objects are similar to objects but can be clicked to open a menu, like say a Sawbench.<br/>They can be also given logic to run all the time so are a powerful tool for your mods.</p>
@@ -371,11 +379,11 @@ __NOTOC__
        |-
        | tooltip || {{D|i=string}} || the tooltip message for this object, shown in expanded tooltips
        |-
-       | shop_key || {{D|i=boolean}} || whether this is a "key" object and so cannot be sold
+       | shop_key || {{D|i=boolean}} || [Optional] whether this is a "key" object and so cannot be sold
        |-
-       | shop_buy || {{D|i=boolean}} || the amount this object can be bought for if sold by an NPC
+       | shop_buy || {{D|i=boolean}} || [Optional] the amount this object can be bought for if sold by an NPC
        |-
-       | shop_sell || {{D|i=boolean}} || the amount this object can be sold for at an NPC
+       | shop_sell || {{D|i=boolean}} || [Optional] the amount this object can be sold for at an NPC
        |-
        | layout || list({{D|i=layout}}) || a list of layouts to set the slots for this objects menu
        |-
@@ -439,17 +447,17 @@ __NOTOC__
        |-
        | tooltip || {{D|i=string}} || the tooltip message for this object, shown in expanded tooltips
        |-
-       | shop_key || {{D|i=boolean}} || whether this is a "key" object and so cannot be sold
+       | shop_key || {{D|i=boolean}} || [Optional] whether this is a "key" object and so cannot be sold
        |-
-       | shop_buy || {{D|i=boolean}} || the amount this object can be bought for if sold by an NPC
+       | shop_buy || {{D|i=boolean}} || [Optional] the amount this object can be bought for if sold by an NPC
        |-
-       | shop_sell || {{D|i=boolean}} || the amount this object can be sold for at an NPC
+       | shop_sell || {{D|i=boolean}} || [Optional] the amount this object can be sold for at an NPC
        |-
        | machines || list({{D|i=string}}) || [Optional] a list of object oids that this object this can be used in, i.e. {{I|i=  ["workbench", "sawmill"]}}, shown in tooltips
        |-
        | tools || list({{D|i=string}}) || [Optional] a list of tools that can be used on this object, i.e. {{I|i=["mouse1", "axe1"]}},   shown in tooltips
        |-
-       | plass_grass || {{D|i=boolean}} || [Optional] this specifies if the object can only be placed on grass
+       | place_grass || {{D|i=boolean}} || [Optional] this specifies if the object can only be placed on grass
        |-
        | place_water || {{D|i=boolean}} || [Optional] this specifies if the object can only be placed on shallow water
        |-
@@ -462,6 +470,12 @@ __NOTOC__
        | honeycore || {{D|i=boolean}} || [Optional] if true, this objects will be bought + sold for honeycore instead of rubees
        |-
        | invisible || {{D|i=boolean}} || [Optional] if true, this object will not be drawn - it's bounding box will still be interactive though!
+       |-
+       | bed || {{D|i=boolean}} || [Optional] if true, this object will act as a bed when clicked
+       |-
+       | bench || {{D|i=boolean}} || [Optional] if true, this object will act as a bench when clicked
+       |-
+       | has_lighting || {{D|i=boolean}} || [Optional] if true, this object will light up at night
        |-
        | has_shadow || {{D|i=boolean}} || [Optional] if true, a shadow will be automatically drawn under this object
        |-
@@ -602,6 +616,19 @@ __NOTOC__
       |-
       | clock || {{D|i=string}} || the current "clock" for the time of day, i.e. {{I|i=12:04}}
      |}<br/>
+     <h2>wall_definition</h2>
+     <p>Represents a definition for a new wall. Walls can be placed down and picked up with a hammer.</p>
+     {| class="wikitable"
+      ! Key !! Datatype !! Description 
+      |-
+      | id || {{D|i=string}} || id to use to create an oid for this item. Unless defining a flower, your new item oid will be a your   mod_id + the item id give, i.e. "sample_mod_my_item"
+      |-
+      | name || {{D|i=string}} || the name of this item, shown in tooltips
+      |-
+      | shop_buy || {{D|i=boolean}} || [Optional] the amount this item can be bought for if sold by an NPC
+      |-
+      | shop_sell || {{D|i=boolean}} || [Optional] the amount this item can be sold for at an NPC
+     |}<br/>
       <h2>weather</h2>
       <p>Represents the current weather when retrieved through {{F|i=api_get_weather}}. Weather is simply either on or off - the weather effects shown are based on the biome the player is currently in.<br/>Weather is decided at the start of a new day, with a 30% chance every day after Day 4 (or 100% chance if currently in a swamp biome)</p>
       {| class="wikitable"
@@ -617,7 +644,7 @@ __NOTOC__
   </div><br/>
 
   <div class="aw-api-section mw-customcollapsible-s1">
-    <h1>[[File:Boat_Item.png|32px]]Hooks</h1>
+    <h1>[[File:Standard_Boat_Item.png|32px]]Hooks</h1>
     <p>Hooks are special functions that allow you to hook into different processes as well as let you actually register and setup your mod. When you register your mod you can specify the hooks you want to apply.<br/>Both {{H|i=register()}} and {{H|i=init()}} are required for your mod to run.<br/>You can only implement one of each hook.</p>
     {| class="wikitable"
      ! Hook !! Description 
@@ -631,6 +658,8 @@ __NOTOC__
      | {{H|i=draw()}} || this hook is called every draw cycle, on the overworld layer
      |-
      | {{H|i=gui()}} || this hook is called every draw cycle, on the gui layer
+     |-
+     | {{H|i=http()}} || this hook is called when a HTTP response is returned from {{F|i=api_http_request()}}
      |-
      | {{H|i=init()}} || this hook is called when the mod is first initialised, allowing you to setup mod code for the first time
      |-
@@ -733,6 +762,35 @@ function gui()
 
   -- draw a circle
   api_draw_circle(px, py, 100, false, "BLACK")
+  
+end
+</syntaxhighlight><br/>
+      <h2>http()</h2>
+      <p>This hook is called every time a HTTP response is returned by {{F|i=api_http_request()}}.<br/>This hook returns regardless of whether the HTTP request succeeded or failed.</p>
+      {| class="wikitable"
+      ! Parameter !! Datatype !! Description 
+      |-
+      | response_id || {{D|i=string}} ||  the string you set in your {{F|i=api_http_request()}} method to help you identify the callback
+      |-
+      | status || {{D|i=string}} || returns either "Success" or "Error" depending on the HTTP status returned
+      |-
+      | response || {{D|i=string}} || response body returned from the HTTP request
+     |}
+      <p>Example code to handle some random HTTP call to get the APICO website homepage:</p>
+<syntaxhighlight lang="lua">
+-- call our HTTP req whereever we like
+function init()
+  api_http_request("https://apico.buzz", "GET", {}, "", "my_request")
+  return "Success"
+end
+
+-- http requests are async so you'll need the http() hook to handle the response
+function http(response_id, status, response)
+
+  -- check the response_id and status before handling the response body
+  if response_id == "my_request" and status == "Success" then
+    api_log("http", response)
+  end
   
 end
 </syntaxhighlight><br/>
@@ -1102,7 +1160,7 @@ end
      |-
      | {{F|i=api_define_object()}} || defines a new object for the game like a Bench or a Statue
      |-
-     | {{F|i=api_define_property()}} || defines a new property on a given instance
+     | {{F|i=api_define_property()}} {{F|i=api_dp}} || defines a new property on a given instance
      |-
      | {{F|i=api_define_quest()}} || defines a new quest for the game, shown in the guide
      |-
@@ -1113,6 +1171,10 @@ end
      | {{F|i=api_define_tank()}} || defines a custom liquid storage tank for a menu
      |-
      | {{F|i=api_define_trait()}} || defines a custom trait to apply to all bees going forward
+     |-
+     | {{F|i=api_define_validation_icon()}} || defines a custom validation icon for "customX" slot validation with {{D|i=layout}}'s
+     |-
+     | {{F|i=api_define_wall()}} || defines a custom wall
     |}
     <div class="mw-collapsible mw-collapsed" id="mw-customcollapsible-s1">
       <h2>api_define_bee()</h2>
@@ -1285,7 +1347,7 @@ function some_menu_draw_method(menu_id)
 end
 
 -- button click script
-function button_click()
+function button_click(menu_id)
   api_create_log("button", "My button has been pressed!")
 end
 </syntaxhighlight><br/>
@@ -1556,9 +1618,6 @@ api_define_item({
   name = "Cool Axe",
   category = "Decoration",
   tooltip = "This is a cool axe!",
-  shop_key = false,
-  shop_buy = 0,
-  shop_sell = 0,
   durability = 1000,
   singular = true
 }, "sprites/cool_axe.png")
@@ -1606,9 +1665,6 @@ function init()
     name = "Recycle Bin",
     category = "Tools",
     tooltip = "Let's you recycle items into random flower seeds",
-    shop_key = false,
-    shop_buy = 0,
-    shop_sell = 0,
     layout = {
       {7, 17},
       {7, 39},
@@ -1891,9 +1947,6 @@ api_define_object({
   name = "Nice Chair",
   category = "Decoration",
   tooltip = "This is a nice chair",
-  shop_key = false,
-  shop_buy = 0,
-  shop_sell = 0,
   tools = {"hammer1"}
 }, "sprites/cool_chair.png", "my_draw_script")
 
@@ -2101,9 +2154,6 @@ function init()
     name = "Water Purifier",
     category = "Tools",
     tooltip = "Let's you collect water from the ocean",
-    shop_key = false,
-    shop_buy = 0,
-    shop_sell = 0,
     layout = {
       {19, 63, "Liquid Output", {"canister1", "canister2"}}
     },
@@ -2128,8 +2178,10 @@ end
 -- setup water purifier tank + gui
 function water_purifier_define(menu_id) 
   -- define a tank gui
-  -- tank props are automatically saved for you so you dont need to add anything to _fields
   api_define_tank(menu_id, 1000, 2000, "water", 4, 14, "xlarge")
+  -- save the special tank props to our menu._fields so the values are saved/loaded
+  fields = {"tank_amount", "tank_max", "tank_type"}
+  fields = api_sp(menu_id, "_fields", fields)
 end
 
 -- handle slot change to drain water into a canister
@@ -2203,6 +2255,88 @@ function click(button, click_type)
   end
 
 end
+</syntaxhighlight><br/>
+      <h2>api_define_validation_icon()</h2>
+      <p>This method allows you to define a custom icon to use with custom validations in {{D|i=layout}}'s for slots.<br/><br/>Custom validations follow the format of "customX:thing" where "thing" is the oid you want to allow in the slot.</p>
+      {| class="wikitable"
+      ! Parameter !! Datatype !! Description 
+      |-
+      | validation || {{D|i=string}} || the custom validation, i.e. "customX:axe" - this has to match what you put in your {{D|i=layout}} 
+      |-
+      | icon_sprite || {{D|i=string}} || the sprite to use for the validation, shown on slot hover. This should be a single 16x16 sprite.
+     |}
+     <p>If this method worked it will return {{I|i=Success}}, otherwise if it fails it will return {{D|i=nil}} and will log an error in the Modding Console with one of the following errors:</p>
+     {| class="wikitable"
+     ! Error !! Description 
+     |-
+     | Sprite Not Found || sprite path not found, check your files
+     |-
+     | Sprite Already Defined || sprite has already been defined for the validation string you gave, maybe you already defined it?
+    |}
+     <p>Example code to add a custom validation to a machine that only takes axes:</p>
+<syntaxhighlight lang="lua">
+-- setup the trait
+function init() 
+
+  -- define a basic menu
+  api_define_menu_object({
+    id = "axe_eater",
+    name = "Axe Eater",
+    category = "Tools",
+    tooltip = "Eats axes, I don't know why don't ask me",
+    layout = {
+      {7, 17, "Input", {"customX:axe"}},
+    },
+    buttons = {"Help", "Target", "Close"},
+    info = {
+      {"1. Axe Input", "GREEN"},
+    },
+    tools = {"mouse1", "hammer1"},
+    placeable = true
+  }, "sprites/axe_eater_item.png", "sprites/axe_eater_menu.png", {})
+
+  -- define a validation icon for "customX:axe"
+  api_define_validation_icon("customX:axe", "sprites/some_axe.png")
+
+  return "Success"
+
+end
+</syntaxhighlight><br/>
+      <h2>api_define_wall()</h2>
+      <p>This method allows you to define your own custom wall that can be placed in-game and act as a solid.</p>
+      {| class="wikitable"
+      ! Parameter !! Datatype !! Description 
+      |-
+      | wall|| {{D|i=wall_definition}} || definition for your new wall
+      |-
+      | wall_sprite || {{D|i=string}} || the spritesheet for the new wall, needs to contain both the item sprites and wall variants, see the example in the [https://github.com/APICO-Modders/APICO-Sample-Mod/blob/main/sprites/wall/wall_sprite.png Sample Mod]
+     |}
+     <p>If this method worked it will return {{I|i=Success}}, otherwise if it fails it will return {{D|i=nil}} and will log an error in the Modding Console with one of the following errors:</p>
+     {| class="wikitable"
+     ! Error !! Description 
+     |-
+     | Missing Required Key || Your definition is missing either "id" or "name"
+     |-
+     | Wall ID Already Defined || There is already a wall defined with this ID, use a different one or check you haven't defined twice
+     |-
+     | Wall Sprite Not Found || Couldn't resolve the path to the sprite specified
+     |-
+     | Failed To Define Wall || Generic catch all, see the error message for clues
+    |}
+     <p>Example code to add a shiny custom wall:</p>
+<syntaxhighlight lang="lua">
+-- setup the trait
+function init() 
+
+  -- define a basic wall
+  api_define_wall({
+    id = 17,
+    name = "Cool Wall" 
+  }, "/sprites/wall/wall_sprite.png")
+
+  return "Success"
+
+end
 </syntaxhighlight>
     </div>
   </div><br/>
@@ -2220,6 +2354,8 @@ end
      | {{F|i=api_draw_line()}} || draws a line at a specific position
      |-
      | {{F|i=api_draw_rectangle()}} || draws a rectangle (solid or outlined) at a specific position
+     |-
+     | {{F|i=api_draw_slots()}} || draws all the slots for a given menu
      |-
      | {{F|i=api_draw_sprite()}} || draws a given sprite at a specific position
      |-
@@ -2326,6 +2462,25 @@ api_draw_line(0, 0, 100, 100, "FONT_GREEN")
      <p>Example code to draw a 100x100px blue rectangular outline:</p>
 <syntaxhighlight lang="lua">
 api_draw_rectangle(0, 0, 100, 100, "FONT_BLUE", true)
+</syntaxhighlight><br/>
+      <h2>api_draw_slots()</h2>
+      <p>This lets you redraw all the slots for a given menu. This is useful if you're trying to draw custom background elements on your menu, as the menu_draw script is called AFTER the default slot/gui rendering. <br/><br/>By using this method you can then redraw the slots on top of whatever you have drawn in your menu_draw script.</p>
+      {| class="wikitable"
+      ! Parameter !! Datatype !! Description 
+      |-
+      | menu_id || {{D|i=integer}} || the menu instance to draw the slots for (NOT the menu object instance)
+     |}
+     <p>Example code to draw a 100x100px blue rectangle in a menu draw cycle then redraw the slots on top:</p>
+<syntaxhighlight lang="lua">
+function my_custom_menu_draw(menu_id)
+
+  mx = api_gp(menu_id, "rx")
+  my = api_gp(menu_id, "ry")
+
+  api_draw_rectangle(mx, my, mx+100, my+100, "FONT_BLUE", true)
+
+  api_draw_slots(menu_id)
+end
 </syntaxhighlight><br/>
       <h2>api_draw_sprite()</h2>
       <p>This let's you draw a sprite that you either created through {{F|i=api_define_sprite()}} or retrieved through {{F|i=api_get_sprite()}}.<br/>You should get your sprite indexes outside of the draw script to help performance.</p>
@@ -2525,6 +2680,8 @@ end
      | {{F|i=api_get_menu_objects()}} || returns a list of {{D|i=instance}}s for all active menu objects, both onscreen and "working" offscreen
      |-
      | {{F|i=api_get_menus_obj()}} || returns the menu object inst for a given menu inst
+     |-
+     | {{F|i=api_get_mouse_inst()}} || returns the mouse inst id for the global mouse instance
      |-
      | {{F|i=api_get_mouse_position()}} || returns a {{D|i=coordinate}} of the current mouse position
      |-
@@ -2915,7 +3072,7 @@ end
 objs = api_get_menu_objects(nil, "hive1")
 count = #objs
 </syntaxhighlight><br/>
-      <h2>api_get_menus_obj</h2>
+      <h2>api_get_menus_obj()</h2>
       <p>This method gets the menu object instance from a given menu instance. As you probably realised these are two different things! Menu objects are the objects in the overworld you click on, and when you click on them they open their menu instance.</p>
       {| class="wikitable"
       ! Parameter !! Datatype !! Description 
@@ -2929,6 +3086,14 @@ function menu_define(menu_id)
   obj_id = api_get_menus_obj(menu_id)
   api_set_immortal(obj_id, true)
 end
+</syntaxhighlight><br/>
+      <h2>api_get_mouse_inst()</h2>
+      <p>This method gets the global mouse instance id, so that you can get or set its properties.<br/>For all purposes you can consider the mouse inst as just a slot, as it has most of the same properties.</p>
+      <p>This method will return the mouse instance as an {{D|i=instance}}.</p>
+     <p>Example code to get the mouse inst and then set the held item to something else:</p>
+<syntaxhighlight lang="lua">
+mouse = api_get_mouse_inst()
+api_sp(mouse["id"], "item", "my_fancy_axe")
 </syntaxhighlight><br/>
       <h2>api_get_mouse_position()</h2>
       <p>This method gets the current mouse position.</p>
@@ -3222,6 +3387,8 @@ api_give_money(420)
     {| class="wikitable"
      ! Method !! Description 
      |-
+     | {{F|i=api_add_slot_to_menu()}} || tries to add the contents of a given slot to a given menu
+     |-
      | {{F|i=api_blacklist_input()}} || blacklists a specific object oid from input meaning normal key presses are ignored while its menu is highlighted
      |-
      | {{F|i=api_check_discovery()}} || checks if a player has discovered (picked up) a given item
@@ -3229,6 +3396,10 @@ api_give_money(420)
      | {{F|i=api_choose()}} || picks randomly from a list of items and returns the result
      |-
      | {{F|i=api_destroy_inst()}} || destroys an instance permanently
+     |-
+     | {{F|i=api_http_request()}} || sends a HTTP request to a specific endpoint
+     |-
+     | {{F|i=api_inst_exists()}} || checks if an inst exists
      |-
      | {{F|i=api_library_add_book()}} || adds a book button to the bottom library bar, with custom click script (this does not define a book for you)
      |-
@@ -3245,6 +3416,22 @@ api_give_money(420)
      | {{F|i=api_unlock_quest()}} || unlocks a specified quest based on it's given quest id
     |}
     <div class="mw-collapsible mw-collapsed" id="mw-customcollapsible-s1">
+      <h2>api_add_slot_to_menu()</h2>
+      <p>This method lets you attempt to add the contents of a slot to a given menu. If there is any "leftover" it will remain in the slot - for example if you tried adding 99 logs to the player menu, but could only fit 50, the remaining 49 logs would still be in the slot.<br/><br/>This method will validate the contents of your slot for you, and find the first valid slot to try and add the item to (this is the method that default shift-clicking uses in-game)</p>
+      {| class="wikitable"
+       ! Parameter !! Datatype !! Description 
+       |-
+       | slot_id || {{D|i=integer}} || the slot id of the slot you want to move the contents for 
+       |-
+       | menu_id || {{D|i=integer}} || the menu id of the menu inst you want to try and move the slot contents to
+      |}
+      <p>Example code to move the contents of the player's first slot into another menu:</p>
+<syntaxhighlight lang="lua">
+player = api_get_player_instance()
+player_slots = api_get_slots(player)
+
+api_add_slot_to_menu(player_slots[1]["id"], MY_OTHER_MENU_ID)
+</syntaxhighlight><br/>
       <h2>api_blacklist_input()</h2>
       <p>This method lets block standard input while a specific object's menu is open. This is useful for being able to handle your own keyboard input without various key presses opening menus or books.<br/><b>The "Escape" key (or whatever is mapped to menu close) is the only exception not blacklisted.</b></p>
       {| class="wikitable"
@@ -3291,7 +3478,7 @@ item_to_give = api_choose({"axe1", "log", "planks1"})
        |-
        | inst_id || {{D|i=integer}} || the id of the instance you want to destroy
       |}
-      <p>This method either returns {{I|i=Success}}, otherwise if it fails it will return {{D|i=nil}} and will log an error in the Modding console with one of the following errors:</p>
+      <p>This method either returns {{I|i=Success}} if the request was sent, otherwise if it fails it will return {{D|i=nil}} and will log an error in the Modding console with one of the following errors:</p>
       {| class="wikitable"
        ! Error !! Description
        |-
@@ -3305,6 +3492,58 @@ function tick()
   for i=1,len do
     api_destroy_inst(trees[i]["id"])
   end
+end
+</syntaxhighlight><br/>
+      <h2>api_http_request()</h2>
+      <p>This method will send a HTTP request to a given endpoint.<br/><br/>You will need to implement the {{H|i=http()}} hook to handle the response as this is an asynchronous call.</p>
+      {| class="wikitable"
+       ! Parameter !! Datatype !! Description 
+       |-
+       | url || {{D|i=string}} || the full URL to send the HTTP request to
+       |-
+       | method_type || {{D|i=string}} || the HTTP method type, i.e. GET or POST
+       |-
+       | headers || {{D|i=table}} || a map of headers to apply to your request
+       |-
+       | body || {{D|i=string}} || a body to send with the request (can just be an empty string)
+      |}
+      <p>This method either returns {{I|i=Success}}, otherwise if it fails it will return {{D|i=nil}} and will log an error in the Modding console with one of the following errors:</p>
+      {| class="wikitable"
+       ! Error !! Description
+       |-
+       | Failed To Send Request || generic catch-all, check your parameters
+      |}
+      <p>Example code to handle some random HTTP call to get the APICO website homepage:</p>
+<syntaxhighlight lang="lua">
+-- call our HTTP req whereever we like
+function init()
+  api_http_request("https://apico.buzz", "GET", {}, "", "my_request")
+  return "Success"
+end
+
+-- http requests are async so you'll need the http() hook to handle the response
+function http(response_id, status, response)
+
+  -- check the response_id and status before handling the response body
+  if response_id == "my_request" and status == "Success" then
+    api_log("http", response)
+  end
+  
+end
+</syntaxhighlight><br/>
+      <h2>api_inst_exists()</h2>
+      <p>This method will check if a given instance ID exists or not. This method will also return false if the instance in question has been deactivated off screen, as for all intents and purposes GMS sees this as not existing too.</p>
+      {| class="wikitable"
+       ! Parameter !! Datatype !! Description 
+       |-
+       | inst_id || {{D|i=integer}} || the id of the instance you want to check exists
+      |}
+      <p>This method returns a {{D|i=boolean}} based on if the instance was found or not.</p>
+      <p>Example code to check a saved instance id exists still:</p>
+<syntaxhighlight lang="lua">
+inst = MY_SAVED_INST
+if (api_inst_exists(inst)) then
+  -- do something cool
 end
 </syntaxhighlight><br/>
       <h2>api_library_add_book()</h2>
@@ -3562,7 +3801,7 @@ end
      |-
      | {{F|i=api_set_position()}} || sets the position for a given instance id
      |-
-     | {{F|i=api_set_property()}} || sets a property on a given instance id
+     | {{F|i=api_set_property()}} {{F|i=api_sp}} || sets a property on a given instance id
      |-
      | {{F|i=api_set_spawn()}} || sets the player spawn position which is used if the player gets stuck
      |-
@@ -3868,7 +4107,7 @@ highlighted = api_get_highlighted("obj")
 api_set_position(highlighted, random_x, random_y)
 </syntaxhighlight><br/>
       <h2>api_set_property()</h2>
-      <p>This method allows you to set a property on an instance so you can use it later. You can also use the "api_sp()" shorthand.<br/><b>When setting custom properties on menu objects you should add the prop_name to the {{I|i=menu_obj._fields}} list key if you want to keep it persistent when the player saves.</b><br/>See [[Instance Properties]] for a full list of all built-in properties for all types of instances.</p>
+      <p>This method allows you to set a property on an instance so you can use it later. You can also use the "api_sp()" shorthand.<br/><b>When setting custom properties on menu objects you should add the prop_name to the related menu's {{I|i=menu._fields}} list key if you want to keep it persistent when the player saves (see {{F|i=api_define_menu_object()}} for an example)</b><br/>See [[Instance Properties]] for a full list of all built-in properties for all types of instances.</p>
       {| class="wikitable"
        ! Parameter !! Datatype !! Description 
        |-
@@ -3985,6 +4224,8 @@ api_set_weather(start_time, end_time)
      |-
      | {{F|i=api_slot_incr()}} || increases a slot amount, capped at 99
      |-
+     | {{F|i=api_slot_item_id()}} || gets a special item data id for a given slot, mainly used by Ell in his weird mods
+     |-
      | {{F|i=api_slot_match()}} || finds a slot/slots that match certain criteria based on the items they have (or dont have)
      |-
      | {{F|i=api_slot_match_range()}} || same as above but specifies a range of slots that the match will check instead of all menu slots
@@ -3994,6 +4235,10 @@ api_set_weather(start_time, end_time)
      | {{F|i=api_slot_set_inactive()}} || sets a slot to be inactive (no hover or click interactions)
      |-
      | {{F|i=api_slot_set_modded()}} || sets a slot to be modded (hover interactions but no click interactions)
+     |-
+     | {{F|i=api_slot_redraw()}} || redraws a slot and it's item
+     |-
+     | {{F|i=api_slot_validate()}} || validates a given item/stats combination for a given slot
     |}
     <div class="mw-collapsible mw-collapsed" id="mw-customcollapsible-s1">
       <h2>api_slot_clear()</h2>
@@ -4142,6 +4387,27 @@ slots = api_get_slots(api_get_player_instance())
 -- increase whatever is in the second slot by 2, if anything
 api_slot_decr(slots[2]["id"], 2)
 </syntaxhighlight><br/>
+      <h2>api_slot_item_id()</h2>
+      <p>If you've ever dug around in the dictionary you've probably seen stuff like "bee:common" or "frame:filled". For some items we have some stat properties that are pretty important for game function, and we use these special "data" ids to represent that.<br/><br/>This method returns the slots current item as a data id, if applicable. This will not work with custom stats, any other item not a frame or a bee will just return the item OID.<br/>This is probably more useful for bee-related stuff, as it saves you having to query the stats for a slot to find out the dominent species.</p>
+      {| class="wikitable"
+       ! Parameter !! Datatype !! Description 
+       |-
+       | menu_id || {{D|i=integer}} || the menu inst that the slot belongs to 
+       |-
+       | slot_index || {{D|i=integer}} || the index of the slot you want to get, starting at 1
+      |}
+      <p>If this method worked it will return a {{D|i=string}} with the data id or OID, empty if no item is present in this slot.</p>
+     <p>Example code to get the item id for the first slot in the players menu:</p>
+<syntaxhighlight lang="lua">
+-- get player slots
+slots = api_get_slots(api_get_player_instance())
+  
+-- get item id for this slot
+item_id = api_slot_item_id(slots[1]["id"])
+if (item_id == "bee:common") then
+  -- do something with a common bee
+end
+</syntaxhighlight><br/>
       <h2>api_slot_match()</h2>
       <p>This method allows you to find a slot or slots that match a given item criteria you define. This is useful to get slots that already have a given item, or say return the first slot that's empty.</p>
       {| class="wikitable"
@@ -4262,6 +4528,55 @@ end
 -- get player slots
 slots = api_get_slots(api_get_player_instance())
 api_slot_set_modded(slots[1]["id"], true)
+</syntaxhighlight><br/>
+      <h2>api_slot_redraw()</h2>
+      <p>This method lets you redraw a given slot, which will redraw any highlighting and the item in the slot. This allows you to do custom draw logic in your menu_draw scripts, while then still being able to layer the slot drawing on top.<br/><br/><b>If wanting to redraw all the slots for a menu you should use {{F|i=api_draw_slots}} for performance reasons!</b></p>
+      {| class="wikitable"
+       ! Parameter !! Datatype !! Description 
+       |-
+       | slot_id || {{D|i=integer}} || the slot id of the slot instance you want to redraw
+      |}
+     <p>Example code to draw a sprite and then redraw a slot in a custom menu_draw script:</p>
+<syntaxhighlight lang="lua">
+function my_custom_menu_draw(menu_id)
+
+  -- get menu position
+  mx = api_gp(menu_id, "rx")
+  my = api_gp(menu_id, "ry")
+  slots = api_get_slots(menu_id)
+
+  -- draw a sprite on the menu
+  api_draw_sprite(SPR_REF, 0, mx, my)
+
+  -- redraw the first slot ontop
+  api_slot_redraw(slots[1]["id"])
+
+end
+</syntaxhighlight><br/>
+      <h2>api_slot_validate()</h2>
+      <p>You may have noticed that if you just use {{F|i=api_set_property()}} on a slot you can put anything in it - this method lets you validate a given item/stat combination to see if it is allowed in a given slot first. This lets you check if that slot can take this item (i.e. checking if Dye can go in the first slot of a Sawbench would fail, as only logs and planks are allowed in that slot).<br/><br/>This does not actually move the item into the slot, just a read-only check.</p>
+      {| class="wikitable"
+       ! Parameter !! Datatype !! Description 
+       |-
+       | slot_id || {{D|i=integer}} || the slot id of the slot instance you want to validate agaisnt
+       |-
+       | item || {{D|i=string}} || the item oid you want to put in the slot, i.e. "axe4"
+       |-
+       | stats || {{D|i=table}} || the stats for the item you want to put in the slot, can be an empty table if no stats needed
+      |}
+     <p>This method will return a {{D|i=boolean}}, true if the item/stats combination you passed can go in the slot.</p>
+     <p>Example code to see if we can add a Bee into a Sawbench (spoilers, you can't)</p>
+<syntaxhighlight lang="lua">
+-- get our slots
+sawbench_slots = api_get_slots(MY_SAWBENCH_MENU_ID)
+
+-- check if we could put a bee in this slot
+check = api_slot_validate(sawbench_slots[1]["id"], "bee", BEE_STATS)
+
+-- if the test fails, do something
+if (check == false) then
+  api_log("test", "nope you can't do that")
+end
 </syntaxhighlight>
     </div>
   </div><br/>
