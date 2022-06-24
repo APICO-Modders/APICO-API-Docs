@@ -1,4 +1,8 @@
 __NOTOC__
+{{#seo:|
+  description=Pssssstt hey kids wanna learn some APIs|
+  image=https://static.miraheze.org/apicowiki/5/5f/Thumbnail-Modding.png|
+}}
 <div class="aw aw-api">
 
   <div class="aw-panel">
@@ -28,9 +32,13 @@ __NOTOC__
    |-
    | [[#Hooks|Hooks]] || Custom hooks your mod can implement to react to certain game events or cycles
    |-
+   | [[#All Methods|All Methods]] || Methods to get all instances of specific types
+   |-
    | [[#Create Methods|Create Methods]] || Methods to create new instances or effects
    |-
    | [[#Define Methods|Define Methods]] || Methods to define things like items, objects, bees, or recipes
+   |-
+   | [[#Describe Methods|Describe Methods]] || Methods to describe game metadata like dictionary definitions
    |-
    | [[#Draw Methods|Draw Methods]] || Methods to draw sprites or shapes in draw cycles
    |-
@@ -136,9 +144,11 @@ __NOTOC__
      |-
      | {{D|i=time}} || Represents the game time
      |-
-     | {{D|i=wall_definition}} Represents a definition for a new wall
+     | {{D|i=wall_definition}} || Represents a definition for a new wall
      |-
      | {{D|i=weather}} || Represents the game weather
+     |-
+     | {{D|i=window_definition}} || Represents a definition for a new window
     |}
     <div class="mw-collapsible mw-collapsed" id="mw-customcollapsible-s2">
       <h2>bee_definition</h2>
@@ -182,7 +192,7 @@ __NOTOC__
        |-
        | bid || {{D|i=string}} || a unique 2 character identifier for this species to use for the beebox / beebank storage. The identifier cannot be a number, i.e. {{I|i=01}} as these are reserved by the base game.<br/>This must be unique across all mods, so ask your fellow modders first!
        |-
-       | calming || list({{D|i=string}}) || [Optional] if this species is grumpy, you can provide a list of flower oids that calm it, i.e. {{I|i=["flower1", "flower2"]}}
+       | calming || list({{D|i=string}}) || [Optional] if this species is grumpy, you can provide a list of flower oids that calm it, i.e. {{I|i=["flower1", "flower2"]}} (see [[OID Reference]])
        |-
        | tier || {{D|i=integer}} || [Optional] the tier this bee should belond to, if there is room. Should be a number between 1-5, if no room is in the given tier it'll try the next tier up until it defaults to 5
       |}<br/>
@@ -261,7 +271,7 @@ __NOTOC__
       |-
       | shop_sell || {{D|i=integer}} || [Optional] the amount this flower can be sold for at an NPC
       |-
-      | machines || list({{D|i=string}}) || [Optional] a list of object oids that this flower can be used in, i.e. {{I|i=  ["workbench", "sawmill"]}}, shown in tooltips
+      | machines || list({{D|i=string}}) || [Optional] a list of object oids that this flower can be used in, i.e. {{I|i=  ["workbench", "sawmill"]}}, shown in tooltips (see [[OID Reference]])
       |-
       | tools || list({{D|i=string}}) || [Optional] a list of tools that can be used on this flower, i.e. {{I|i=["mouse1", "axe1"]}},   shown in tooltips
       |-
@@ -270,6 +280,8 @@ __NOTOC__
       | chance || {{D|i=integer}} || [Optional] the chance this species will be formed as a mutation, defaults to 100
       |-
       | smoker || list({{D|i=string}}) || [Optional] a list of bee species that this flower can be used to calm in a smoker, i.e. {{I|i=["stubborn"]}}
+      |-
+      | has_lighting || {{D|i=boolean}} || [Optional] if true, the flower will light up at night like Pondshine
       |}<br/>
       <h2>info</h2>
       <p>Represents a list of information tooltips to use with a menu object's definition. This is the information shown when someone pressed the "Help" button for a menu.<br/>Technically this is a list of values, hence the keys below being numbers.</p>
@@ -300,7 +312,7 @@ __NOTOC__
       |-
       | y || {{D|i=integer}} || the y position of this inst
       |-
-      | oid || {{D|i=integer}} || the APICO "id" value used with the Dictionary - will be nil on item/slot instances
+      | oid || {{D|i=integer}} || the APICO "id" value used with the Dictionary - will be nil on item/slot instances (see [[OID Reference]])
       |-
       | sprite_index || {{D|i=integer}} || the sprite image id used for this instance
       |-
@@ -319,7 +331,7 @@ __NOTOC__
      {| class="wikitable"
       ! Key !! Datatype !! Description 
       |-
-      | id || {{D|i=string}} || id to use to create an oid for this item. Unless defining a flower, your new item oid will be a your   mod_id + the item id give, i.e. "sample_mod_my_item"
+      | id || {{D|i=string}} || id to use to create an oid for this item. Unless defining a flower, your new item oid will be a your   mod_id + the item id give, i.e. "sample_mod_my_item" (be mindful of [[Reserved OIDs]])
       |-
       | name || {{D|i=string}} || the name of this item, shown in tooltips
       |-
@@ -333,9 +345,9 @@ __NOTOC__
       |-
       | shop_sell || {{D|i=boolean}} || [Optional] the amount this item can be sold for at an NPC
       |-
-      | machines || list({{D|i=string}}) || [Optional] a list of object oids that this item this can be used in, i.e. {{I|i=["workbench",   "sawmill"]}}, shown in tooltips
+      | machines || list({{D|i=string}}) || [Optional] a list of object oids that this item this can be used in, i.e. {{I|i=["workbench",   "sawmill"]}}, shown in tooltips (see [[OID Reference]])
       |-
-      | placeable || {{D|i=boolean}} || [Optional] whether this item can be placed down on the ground, will use the object oid specified   in "obj" if true
+      | placeable || {{D|i=boolean}} || [Optional] whether this item can be placed down on the ground, will use the object oid specified in "obj" if true
       |-
       | place_grass || {{D|i=boolean}} || [Optional] if placeable, this specifies if the item can only be placed on grass
       |-
@@ -371,7 +383,7 @@ __NOTOC__
       {| class="wikitable"
        ! Key !! Datatype !! Description 
        |-
-       | id || {{D|i=string}} || id to use to create an oid for this object. Your new object oid will be a your mod_id + the object id give, i.e. "sample_mod_my_object"
+       | id || {{D|i=string}} || id to use to create an oid for this object. Your new object oid will be a your mod_id + the object id give, i.e. "sample_mod_my_object" (be mindful of [[Reserved OIDs]])
        |-
        | name || {{D|i=string}} || the name of this object shown in tooltips
        |-
@@ -391,7 +403,7 @@ __NOTOC__
        |-
        | buttons || list({{D|i=string}}) || a list of buttons for this objects menu to have, valid options are {{I|i=Help}}, {{I|i=Target}}, {{I|i=Sort}}, {{I|i=Move}}, {{I|i=Close}}
        |-
-       | machines || list({{D|i=string}}) || [Optional] a list of object oids that this object this can be used in, i.e. {{I|i=  ["workbench", "sawmill"]}}, shown in tooltips
+       | machines || list({{D|i=string}}) || [Optional] a list of object oids that this object this can be used in, i.e. {{I|i=  ["workbench", "sawmill"]}}, shown in tooltips (see [[OID Reference]])
        |-
        | tools || list({{D|i=string}}) || [Optional] a list of tools that can be used on this object, i.e. {{I|i=["mouse1", "axe1"]}},   shown in tooltips
        |-
@@ -422,7 +434,7 @@ __NOTOC__
        |-
        | tooltip || {{D|i=string}} || the tooltip message for this NPC, usually just a greeting message
        |-
-       | specials || list({{D|i=string}}) || a list of at least 3 item oids that this NPC will have in it's special item pool
+       | specials || list({{D|i=string}}) || a list of at least 3 item oids that this NPC will have in it's special item pool 
        |-
        | stock|| list({{D|i=string}}) || a list of up to 10 item oids that this NPC will have as it's shop stock
        |-
@@ -439,7 +451,7 @@ __NOTOC__
       {| class="wikitable"
        ! Key !! Datatype !! Description 
        |-
-       | id || {{D|i=string}} || id to use to create an oid for this object. Unless defining a flower, your new object oid will be a your   mod_id + the object id give, i.e. "sample_mod_my_object"
+       | id || {{D|i=string}} || id to use to create an oid for this object. Unless defining a flower, your new object oid will be a your   mod_id + the object id give, i.e. "sample_mod_my_object" (be mindful of [[Reserved OIDs]])
        |-
        | name || {{D|i=string}} || the name of this object shown in tooltips
        |-
@@ -453,9 +465,11 @@ __NOTOC__
        |-
        | shop_sell || {{D|i=boolean}} || [Optional] the amount this object can be sold for at an NPC
        |-
-       | machines || list({{D|i=string}}) || [Optional] a list of object oids that this object this can be used in, i.e. {{I|i=  ["workbench", "sawmill"]}}, shown in tooltips
+       | machines || list({{D|i=string}}) || [Optional] a list of object oids that this object this can be used in, i.e. {{I|i=  ["workbench", "sawmill"]}}, shown in tooltips (see [[OID Reference]])
        |-
        | tools || list({{D|i=string}}) || [Optional] a list of tools that can be used on this object, i.e. {{I|i=["mouse1", "axe1"]}},   shown in tooltips
+       |-
+       | drops || list({{D|i=string}}) || [Optional] a list of items that will be dropped when this object is chopped/mined (see "tree" or "shrub" definitions in the dictionary for examples of formatting)
        |-
        | place_grass || {{D|i=boolean}} || [Optional] this specifies if the object can only be placed on grass
        |-
@@ -463,7 +477,9 @@ __NOTOC__
        |-
        | place_deep || {{D|i=boolean}} || [Optional] this specifies if the object can only be placed on deep water
        |-
-       | durability || {{D|i=boolean}} || [Optional] if specified, object created with this definition will have a durability, like tools
+       | durability || {{D|i=boolean}} || [Optional] if specified, objects created with this definition will have a durability, like tools (this is NOT the same as health)
+       |-
+       | hp || {{D|i=boolean}} || [Optional] if specified, object created will have health, likes trees (this is NOT the same as durability)
        |-
        | singular || {{D|i=boolean}} || [Optional] if specified, objects created with this definition will not be able to stack, like frames
        |-
@@ -483,7 +499,7 @@ __NOTOC__
        |-
        | variants || {{D|i=integer}} || [Optional] for nature objects, like trees, this specifies the amount of variants within the sprite   for the object
        |-
-       | growth || {{D|i=string}} || [Optional] if set, after the object is created a timer will start, after which a new object will be   created instead, for example saplings in the game use {{I|i["tree 360 560"]}} to make a tree randomly after 360-560 seconds
+       | growth || {{D|i=string}} || [Optional] if set, after the object is created a timer will start, after which a new object will be   created instead, for example saplings in the game use {{I|i="tree 360 560"}} to make a tree randomly after 360-560 seconds
        |-
        | item_sprite || {{D|i=string}} || [Optional] if you have an object that's overworld sprite is bigger than 16x16, you can use this to specify an alternate sprite to use as the item + slot sprite
       |}<br/>
@@ -498,7 +514,7 @@ __NOTOC__
        |-
        | reqs || list({{D|i=string}}) || the requirements needed for the quest to be ready, e.g. {{I|i=["axe1@2"]}} would mean 2 wooden axes are needed to complete
        |-
-       | icon || {{D|i=string}} || the item oid of the item to use for the icon in the overview section of the book
+       | icon || {{D|i=string}} || the item oid of the item to use for the icon in the overview section of the book (see [[OID Reference]])
        |-
        | reward || {{D|i=string}} || the reward that will be given when the quest is handed in, e.g. {{I|i="honeycore1@10"}} would give 10 honeycore crystals
        |-
@@ -522,7 +538,7 @@ __NOTOC__
       {| class="wikitable"
        ! Key !! Datatype !! Description 
        |-
-       | item || {{D|i=string}} || the item oid that this recipe will craft
+       | item || {{D|i=string}} || the item oid that this recipe will craft (see [[OID Reference]])
        |-
        | recipe || list({{D|i=ingredient}}) || the ingredients to use for this recipe
        |-
@@ -593,7 +609,7 @@ __NOTOC__
       |-
       | index || {{D|i=integer}} || the index of this slot within a menu based on the menu layout, starting at 1
       |-
-      | item || {{D|i=string}} || if this slot holds an item, this will be the item oid, otherwise it'll be blank, i.e. {{I|i=""}}
+      | item || {{D|i=string}} || if this slot holds an item, this will be the item oid, otherwise it'll be blank, i.e. {{I|i=""}} (see [[OID Reference]])
       |-
       | count || {{D|i=integer}} || if this slot holds a non-singular item, this will store the count of the slot
       |-
@@ -601,7 +617,7 @@ __NOTOC__
       |-
       | total_health || {{D|i=integer}} || if this slot holds an item with durability, this will be the full durability amount
       |-
-      | stats || {{D|i=table}} || used by frames + bees, not really something I think you can usefully use atm but it's there for you curious cats!
+      | stats || {{D|i=stats}} || used by frames, canisters and bees (or anything you might have set manually)
      |}<br/>
       <h2>time</h2>
       <p>Represents the current game time when retrieved through {{F|i=api_get_time}}.<br/>Dawn starts at 3am and ends at 7am. Dusk starts at 5pm and ends at 9pm.</p>
@@ -621,7 +637,20 @@ __NOTOC__
      {| class="wikitable"
       ! Key !! Datatype !! Description 
       |-
-      | id || {{D|i=string}} || id to use to create an oid for this item. Unless defining a flower, your new item oid will be a your   mod_id + the item id give, i.e. "sample_mod_my_item"
+      | id || {{D|i=string}} || id to use to create an oid for this item, must be unique across all mods (i.e. wall90001)
+      |-
+      | name || {{D|i=string}} || the name of this item, shown in tooltips
+      |-
+      | shop_buy || {{D|i=boolean}} || [Optional] the amount this item can be bought for if sold by an NPC
+      |-
+      | shop_sell || {{D|i=boolean}} || [Optional] the amount this item can be sold for at an NPC
+     |}<br/>
+     <h2>window_definition</h2>
+     <p>Represents a definition for a new window. Windows can be placed on walls and picked up with a hammer.</p>
+     {| class="wikitable"
+      ! Key !! Datatype !! Description 
+      |-
+      | id || {{D|i=string}} || id to use to create an oid for this item, must be unique across all mods (i.e. window90001)
       |-
       | name || {{D|i=string}} || the name of this item, shown in tooltips
       |-
@@ -645,7 +674,7 @@ __NOTOC__
 
   <div class="aw-api-section mw-customcollapsible-s1">
     <h1>[[File:Standard_Boat_Item.png|32px]]Hooks</h1>
-    <p>Hooks are special functions that allow you to hook into different processes as well as let you actually register and setup your mod. When you register your mod you can specify the hooks you want to apply.<br/>Both {{H|i=register()}} and {{H|i=init()}} are required for your mod to run.<br/>You can only implement one of each hook.</p>
+    <p>Hooks are special functions that allow you to hook into different processes as well as let you actually register and setup your mod. When you register your mod you can specify the hooks you want to apply.<br/>Both {{H|i=register()}} and {{H|i=init()}} are required for your mod to run.<br/>You can only have one function for each hook (i.e. you can't have two "click()" hooks).</p>
     {| class="wikitable"
      ! Hook !! Description 
      |-
@@ -653,9 +682,13 @@ __NOTOC__
      |-
      | {{H|i=clock()}} || this hook is called every 1s of real-time
      |-
+     | {{H|i=create()}} || this hook is a called whenever an object (tree, flower, generic object, menu object) or item is created
+     |-
      | {{H|i=data()}} || this hook is a callback used whenever you call {{F|i=api_get_data()}} or {{F|i=api_set_data()}} due to file load being async
      |-
-     | {{H|i=draw()}} || this hook is called every draw cycle, on the overworld layer
+     | {{H|i=destroy()}} || this hook is a called whenever an object (tree, flower, generic object, menu object) is destroyed
+     |-
+     | {{H|i=draw()}} || this hook is called every draw cycle, on the overworld layer (above objects)
      |-
      | {{H|i=gui()}} || this hook is called every draw cycle, on the gui layer
      |-
@@ -672,6 +705,10 @@ __NOTOC__
      | {{H|i=register()}} || this hook is called first to register the mod with a unique name and setup required hooks
      |-
      | {{H|i=save()}} || this hook is called whenever the player saves or the autosave is called
+     |-
+     | {{H|i=scroll()}} || this hook is called when the mouse wheel is scrolled
+     |-
+     | {{H|i=tdraw()}} || this hook is called every draw cycle, on the overworld layer (above tiles but below objects)
      |-
      | {{H|i=tick()}} || this hook is called ever 0.1s of real time
      |-
@@ -709,6 +746,34 @@ function clock()
   api_give_item("log", 1)
 end
 </syntaxhighlight><br/>
+      <h2>create()</h2>
+      <p>This hook is called whenever an item, tree, flower, generic object, or menu object is destroyed. This will happen for all created items so be sure to be filtering out your logic by specific oid / type!<br/><b>As items can be picked up sometimes immedietely you should be careful on modifying items through this hook as the item may already have been destroyed (i.e. picked up)</b></p>
+      {| class="wikitable"
+      ! Parameter !! Datatype !! Description 
+      |-
+      | id || {{D|i=integer}} ||  the instance id of the inst that just got destroyed
+      |-
+      | x || {{D|i=integer}} || the x position of the inst that just go destroyed
+      |-
+      | y || {{D|i=integer}} || the y position of the inst that just go destroyed
+      |-
+      | oid|| {{D|i=string}} || the oid of the inst that just go destroyed (see [[OID Reference]])
+      |-
+      | inst_type || {{D|i=string}} || the "type" of inst created, can be one of the following: {{I|i=tree}}, {{I|i=flower}}, {{I|i=obj}}, {{I|i=menu_obj}}, or {{I|i=item}}
+     |}
+     <p>Example code to drop a custom item whenever a tree is chopped down:</p>
+<syntaxhighlight lang="lua">
+function create(id, x, y, oid, inst_type) 
+
+  -- whenever a tree is created (i.e. growing from a sapling)
+  -- turn it into skipper
+  if oid == "tree" and inst_type == "tree" then
+    api_create_obj("npc1", x, y)
+    api_destroy_inst(id)
+  end
+
+end
+</syntaxhighlight><br/>
       <h2>data()</h2>
       <p>This hook is called whenever you call the {{F|i=api_get_data()}} or {{F|i=api_set_data()}} methods, as file loading is asynchronous.<br/>Each mod has it's own dedicated JSON file that you can read and write to through the API to avoid direct file access.</p>
       {| class="wikitable"
@@ -730,6 +795,30 @@ function data(ev, data)
     -- do something with our data
     val = data["value"]
   end
+end
+</syntaxhighlight><br/>
+      <h2>destroy()</h2>
+      <p>This hook is called whenever a tree, flower, generic object, or menu object is destroyed.<br/>While you will be passed the instance ID of the instance destroyed, this instance will no longer exist so you cannot use methods like {{F|i=api_get_data()}} or {{F|i=api_set_data()}}.</p>
+      {| class="wikitable"
+      ! Parameter !! Datatype !! Description 
+      |-
+      | id || {{D|i=integer}} ||  the instance id of the inst that just got destroyed
+      |-
+      | x || {{D|i=integer}} || the x position of the inst that just go destroyed
+      |-
+      | y || {{D|i=integer}} || the y position of the inst that just go destroyed
+      |-
+      | oid|| {{D|i=string}} || the oid of the inst that just go destroyed (see [[OID Reference]])
+     |}
+     <p>Example code to drop a custom item whenever a tree is chopped down:</p>
+<syntaxhighlight lang="lua">
+function destroy(id, x, y, oid) 
+
+  -- if tree was destroyed, drop an item
+  if oid == "tree" then
+    api_create_item("my_new_obj", 10, x, y)
+  end
+
 end
 </syntaxhighlight><br/>
       <h2>draw()</h2>
@@ -845,7 +934,7 @@ function draw()
 end
 </syntaxhighlight><br/>
       <h2>ready()</h2>
-      <p>This hook is called when all mods have been both registered and initialised. If your mod relies on another mod or just wants to know when everything is ready then it can listen for this event.<br/>This event is called after all world objects are loaded in, including mod objects.</p>
+      <p>This hook is called when all mods have been both registered and initialised. If your mod relies on another mod or just wants to know when everything is ready then it can listen for this event.<br/>This event is called after all world objects are loaded in, including mod objects, and is called right as the player is able to control themselves.</p>
       <p>Example code to run a function from another mod after all mods have loaded:</p>
 <syntaxhighlight lang="lua">
 function ready()
@@ -862,16 +951,19 @@ end
       {| class="wikitable"
       ! Parameter !! Datatype !! Description 
       |-
-      | name || {{D|i=string}} || the unique name of your mod that has been registered with TNgineers (ask Ell)
+      | name || {{D|i=string}} || the unique name of your mod
       |-
       | hooks || list({{D|i=string}}) || a list of hooks you want your mod to subscribe too, i.e. {{I|i=<nowiki>{"click", "clock"}</nowiki>}}. You do not need to specify "register" or "init" as they are required.
+      |-
+      | modules || list({{D|i=string}}) || a list of "modules" you want your mod to load. These should be the names of .lua files within a folder called "modules" at the root of your mod. All mod files will be loaded into one single file so any scripts or globals in each file will be accessible from each other.
      |}
      <p>Example code to register "sample_mod" and subscribe to the {{H|i=clock()}} and {{H|i=tick()}} hooks</p>
 <syntaxhighlight lang="lua">
 function register() 
   return {
     name = "sample_mod",
-    hooks = {"clock", "tick"}
+    hooks = {"clock", "tick"},
+    modules = {"define"} -- will load /modules/define.lua (if it exists)
   }
 end
 </syntaxhighlight><br/>
@@ -902,6 +994,54 @@ function data(ev, data)
   end
 end
 </syntaxhighlight><br/>
+      <h2>scroll()</h2>
+      <p>This hook is called whenever the mouse wheel is scrolled</p>
+      {| class="wikitable"
+      ! Parameter !! Datatype !! Description 
+      |-
+      | direction || {{D|i=string}} || either {{I|i=UP}} or {{I|i=DOWN}}
+      |-
+      | inverse || {{D|i=boolean}} || whether the player has set inverse scroll in their settings
+     |}
+      <p>Example code to affect some drawing offset with the scroll:</p>
+<syntaxhighlight lang="lua">
+SCROLL_Y = 0
+
+-- handle scroll
+function scroll(direction, inverse)
+  if direction == "UP" then
+    SCROLL_Y = SCROLL_Y + 1
+  else
+    SCROLL_Y = SCROLL_Y - 1
+  end
+end
+
+-- draw a circle at the player position, offset by the scroll amount
+function draw() 
+  cam = api_get_camera_position()
+  player = api_get_player_position()
+  px = player["x"] - cam["x"]
+  py = player["y"] - cam["y"]
+  api_draw_circle(px, py + SCROLL_Y, 100, "FONT_RED", false)
+end
+</syntaxhighlight><br/>
+      <h2>tdraw()</h2>
+      <p>This hook is called every in-game draw cycle. This hook allows you to use the various Draw Methods to draw stuff every cycle.<br/>This hook is similar to {{H|i=draw()}} except it will draw things underneath the object layer (i.e. for drawing fake tiles).</p>
+      <p>Example code to draw a circle that will be below objects/walls:</p>
+<syntaxhighlight lang="lua">
+function tdraw()
+
+  -- get position
+  player_pos = api_get_player_position()
+  cam_pos = api_get_cam()
+  px = player_pos["x"] - cam_pos["x"]
+  py = player_pos["y"] - cam_pos["y"]
+
+  -- draw a circle
+  api_draw_circle(px, py, 100, "FONT_RED", false)
+
+end
+</syntaxhighlight><br/>
       <h2>tick()</h2>
       <p>This hook is called every 0.1 of real time, enabling you to handle things that need to happy more often and update quickly rather than wait for every second in {{H|i=clock()}}.<br/><b>Please check the logic you are running in this hook along with the FPS meter to ensure you are not starting to reduce performance!</b></p><p><b>Do not leave {{F|i=api_create_log()}} calls in this method!!!</b></p>
       <p>Example code to update a counter every tick:</p>
@@ -925,22 +1065,135 @@ function step()
 end
 </syntaxhighlight><br/>
       <h2>worldgen()</h2>
-      <p>This hook is called after the initial world generation is complete (land blobs have been placed by the blueprint but objects have not been created yet). This gives you a chance to alter the ground or add structures, or even generate your own objects if you set the blueprint to be blank with {{F|i=api_set_blueprint()}}.<br/>For reference, game worlds are 350x350 tiles, with 290x290 being visible on the map and rest being reserved for secret areas.</p>
+      <p>This hook is called twice - firstly after the initial world generation is complete (land blobs have been placed by the blueprint but objects have not been created yet), the secondly after all objects have been created. This gives you a chance to alter the ground or add structures, generate your own objects if you set the blueprint to be blank with {{F|i=api_set_blueprint()}}, or "replace" existing objects in the world.<br/>For reference, game worlds are 350x350 tiles, with 290x290 being visible on the map and rest being reserved for secret areas.</p>
+      {| class="wikitable"
+      ! Parameter !! Datatype !! Description 
+      |-
+      | before_objects || {{D|i=boolean}} || as the hook is called twice, this bool tells you if this is the pre-object call or post-object call
+     |}
       <p>Example code to change the player's start position when the world is created:</p>
 <syntaxhighlight lang="lua">
-function worldgen()
+function worldgen(before_objects)
 
-  -- loop through all world tiles
-  for x=0,290 do
-    for y=0, 290 do
-      -- do something with this tile
-      ground = api_get_ground(x*16, y*16)
+  -- after tiles set, change some tiles!
+  if before_objects then
+
+    -- loop through all world tiles
+    for x=0,290 do
+      for y=0, 290 do
+        -- do something with this tile
+        ground = api_get_ground(x*16, y*16)
+      end
     end
+  
+    -- move the player to a different start position
+    api_set_player_position(100, 200)
+
+  -- after objects set, change some objs!
+  else
+
+    -- replace some trees with our own fake trees (1% chance)
+    all_trees = api_all_trees()
+    for t=1,#all_trees do
+      if api_random(100) < 1 then
+        api_create_obj("sample_mod_fake_tree", api_gp(all_trees[t], "x"), api_gp(all_trees[t], "y"))
+        api_destroy_inst(all_trees[t])
+      end
+    end
+
   end
 
-  -- move the player to a different start position
-  api_set_player_position(100, 200)
+end
+</syntaxhighlight>
+    </div>
+  </div><br/>
+  
+  <div class="aw-api-section mw-customcollapsible-s1">
+    <h1>[[File:Barrel_Item.png|32px]]All Methods</h1>
+    <p>All methods allow you to get all instances of a given type regardless of where they are in the world (both active and inactive). <b>They should be used extremely sparingly, as they cause all objects to be momentarily activated!<br>Do NOT use these in tick()/clock() hooks</b></p>
+    {| class="wikitable"
+     ! Method !! Description 
+     |-
+     | {{F|i=api_all_flowers()}} || returns a list of all flower instance ids in the world
+     |-
+     | {{F|i=api_all_trees()}} || returns a list of all tree instance ids in the world
+     |-
+     | {{F|i=api_all_menu_objects()}} || returns a list of all menu object instance ids in the world
+     |-
+     | {{F|i=api_all_objects()}} || returns a list of all generic object instance ids in the world
+    |}
+    <div class="mw-collapsible mw-collapsed" id="mw-customcollapsible-s1">
+      <h2>api_all_flowers()</h2>
+      <p>This method returns the IDs of all flowers in the world, regardless of whether they are onscreen or not.</p>
+      {| class="wikitable"
+      ! Parameter !! Datatype !! Description 
+      |-
+      | oid || {{D|i=string}} || filter results to a specific oid (ideally you should always provide a filter) (see [[OID Reference]])
+     |}
+     <p>This method will return a list of {{D|i=integer}}s for each instance ID, which you can then use with other methods.</p>
+     <p>Example code to get all Honeyrose flowers in the world and then DESTROY THEM:</p>
+<syntaxhighlight lang="lua">
+-- remove all flowers
+-- i dont know why you'd want to do this either, maybe you just dont like the color red
+flowers = api_all_flowers("flower1")
+for i=1,#flowers do
+  api_destroy_inst(flowers[i])
+end
+</syntaxhighlight><br/>
+      <h2>api_all_trees()</h2>
+      <p>This method returns the IDs of all trees in the world, regardless of whether they are onscreen or not.</p>
+     <p>This method will return a list of {{D|i=integer}}s for each instance ID, which you can then use with other methods.</p>
+     <p>Example code to get all trees in the world and turn 10% of them into Skipper:</p>
+<syntaxhighlight lang="lua">
+-- turn 10% of all trees into skipper
+-- yes this hangs for a bit, what did you expect lol
+trees = api_all_trees()
+for i=1,#trees do
+  if api_random(100) < 10 then
 
+    -- turn tree into skipper
+    api_create_obj("npc1", api_gp(trees[i], "x"), api_gp(trees[i], "y"))
+    api_destroy_inst(trees[i])
+
+  end
+end
+</syntaxhighlight><br/>
+      <h2>api_all_menu_objects()</h2>
+      <p>This method returns the IDs of all menu objects (machines, beehives, npcs etc) in the world, regardless of whether they are working or not.</p>
+      {| class="wikitable"
+      ! Parameter !! Datatype !! Description 
+      |-
+      | oid || {{D|i=string}} || filter results to a specific oid (ideally you should always provide a filter) (see [[OID Reference]])
+     |}
+     <p>This method will return a list of {{D|i=integer}}s for each instance ID, which you can then use with other methods.</p>
+     <p>Example code to get all the Skippers in the world, and then duplicate them:</p>
+<syntaxhighlight lang="lua">
+-- infinity skippers
+skippers = api_all_menu_objects("npc1")
+for i=1,#skippers do
+  -- make a new skipper for each skipper
+  api_create_obj("npc1", 
+    api_gp(skippers[i], "x") + api_random_range(-8, 8), 
+    api_gp(skippers[i], "y") + api_random_range(-8, 8)
+  )
+end
+</syntaxhighlight><br/>
+      <h2>api_all_objects()</h2>
+      <p>This method returns the IDs of all generic objects (rocks, shrubs, benches etc) in the world, regardless of whether they are onscreen or not.</p>
+      {| class="wikitable"
+      ! Parameter !! Datatype !! Description 
+      |-
+      | oid || {{D|i=string}} || filter results to a specific oid (ideally you should always provide a filter) (see [[OID Reference]])
+     |}
+     <p>This method will return a list of {{D|i=integer}}s for each instance ID, which you can then use with other methods.</p>
+     <p>Example code to get all rocks in the world and turn them into Honeycore:</p>
+<syntaxhighlight lang="lua">
+-- turn all rocks into honeycore
+-- dont come crying to me when you inevitably bork your saves
+objs = api_all_objects("rock1")
+for i=1,#objs do
+  api_create_obj("honeycore1", api_gp(objs[i], "x"), api_gp(objs[i], "y"))
+  api_destroy_inst(objs[i])
 end
 </syntaxhighlight>
     </div>
@@ -960,7 +1213,7 @@ end
      |-
      | {{F|i=api_create_item()}} || creates an item at a given position
      |-
-     | {{F|i=api_create_log()}} {{F|i=api_log()}} || creates a log in the Modding Console (opened with {{I|i=.}})
+     | {{F|i=api_create_log()}} {{F|i=api_log()}} || creates a log in the Modding Console (opened with {{I|i=CTRL}}+{{I|i=.}})
      |-
      | {{F|i=api_create_obj()}} || creates an object or menu object at a given position
      |-
@@ -1043,7 +1296,7 @@ end
       {| class="wikitable"
       ! Parameter !! Datatype !! Description 
       |-
-      | item || {{D|i=string}} || the item oid of the item you want to create
+      | item || {{D|i=string}} || the item oid of the item you want to create (see [[OID Reference]])
       |-
       | count || {{D|i=integer}} || the number of the item to create
       |-
@@ -1063,7 +1316,7 @@ player_pos = api_get_player_position()
 api_create_item("log", 50, player_pos["x"] - 32, player_pos["y"] + 48)
 </syntaxhighlight><br/>
       <h2>api_create_log()</h2>
-      <p>Your new best friend! This logs something to the Modding Console, which you can toggle with {{I|i=.}}. Each log is shown broken down into the mod name, the group, and then the message.<br/>You can also use a shorthand of "api_log()".</p>
+      <p>Your new best friend! This logs something to the Modding Console, which you can toggle with {{I|i=CTRL}}+{{I|i=.}}. Each log is shown broken down into the mod name, the group, and then the message.<br/>You can also use a shorthand of "api_log()".</p>
       {| class="wikitable"
       ! Parameter !! Datatype !! Description 
       |-
@@ -1080,7 +1333,7 @@ api_log("test_log", "Hello World!")
       {| class="wikitable"
       ! Parameter !! Datatype !! Description 
       |-
-      | oid || {{D|i=string}} || the object oid of the object you want to create
+      | oid || {{D|i=string}} || the object oid of the object you want to create (see [[OID Reference]])
       |-
       | x || {{D|i=integer}} || the x position to create the object at
       |-
@@ -1152,6 +1405,10 @@ end
      |-
      | {{F|i=api_define_item()}} || defines a new item for the game like Logs or Planks
      |-
+     | {{F|i=api_define_item_stats()}} || defines the default "stats" an item will get created with
+     |-
+     | {{F|i=api_define_liquid()}} || defines a custom liquid to use in barrels, canisters, or your own menu object tanks
+     |-
      | {{F|i=api_define_menu_object()}} || defines a new menu object for the game like a Workbench or a Beehive
      |-
      | {{F|i=api_define_notification()}} || defines a new notification type along with a dismiss script for when it's clicked
@@ -1164,7 +1421,7 @@ end
      |-
      | {{F|i=api_define_quest()}} || defines a new quest for the game, shown in the guide
      |-
-     | {{F|i=api_define_recipe()}} || defines a new recipe for the Workbench
+     | {{F|i=api_define_recipe()}} || defines a new recipe for the Mod Workbench
      |-
      | {{F|i=api_define_sprite()}} || defines a custom sprite to use in draw calls
      |-
@@ -1175,6 +1432,10 @@ end
      | {{F|i=api_define_validation_icon()}} || defines a custom validation icon for "customX" slot validation with {{D|i=layout}}'s
      |-
      | {{F|i=api_define_wall()}} || defines a custom wall
+     |-
+     | {{F|i=api_define_window()}} || defines a custom window
+     |-
+     | {{F|i=api_define_workbench()}} || defines the mod and tab labels shown in the Mod Workbench
     |}
     <div class="mw-collapsible mw-collapsed" id="mw-customcollapsible-s1">
       <h2>api_define_bee()</h2>
@@ -1523,13 +1784,13 @@ api_define_flower_recipe("flower1", "flower4", "flower12")
 
 </syntaxhighlight><br/>
       <h2>api_define_gui()</h2>
-      <p>This lets you create a custom GUI for a given menu. GUIs let you have an interactive section of the menu that shows a tooltip when hovered. In the game these are used for things like progress meters, arrows, and tanks.</p>
+      <p>This lets you create a custom GUI for a given menu. GUIs let you have an interactive section of the menu that shows a tooltip when hovered. In the game these are used for things like progress meters, arrows, and tanks.<br/><b>Your "gui_key" should be unique per menu object define (i.e. don't use "progress" for 2 different menu objects).</b></b></p>
       {| class="wikitable"
       ! Parameter !! Datatype !! Description 
       |-
       | menu_id || {{D|i=integer}} || the menu object instance id you want to define attach the gui to
       |-
-      | gui_key || {{D|i=string}} || the name of the key you want to use which will allow you to access the gui instance if you need it later
+      | gui_key || {{D|i=string}} || the name of the key you want to use which will allow you to access the gui instance if you need it later (needs to be unique per define)
       |-
       | gui_ox || {{D|i=integer}} || the relative x position of the gui from the top-left of the menu sprite
       |-
@@ -1555,10 +1816,10 @@ api_define_flower_recipe("flower1", "flower4", "flower12")
 function some_menu_define(menu_id)
 
   -- create gui for the menu
-  api_define_gui(menu_id, "progress_bar", 49, 20, "recycler_gui_tooltip", "sprites/recycler_gui_arrow.png")
+  api_define_gui(menu_id, "recycler_progress_bar", 49, 20, "recycler_gui_tooltip", "sprites/recycler_gui_arrow.png")
   
   -- save gui sprite ref for later
-  api_dp(menu_id, "progress_bar_sprite", api_get_sprite("sample_mod_progress_bar"))
+  api_dp(menu_id, "progress_bar_sprite", api_get_sprite("sample_mod_recycler_progress_bar"))
 
 end
 
@@ -1569,7 +1830,7 @@ function some_menu_draw(menu_id)
   cam = api_get_cam()
   
   -- draw gui progress here
-  gui = api_get_inst(api_gp(menu_id, "progress_bar"))
+  gui = api_get_inst(api_gp(menu_id, "recycler_progress_bar"))
   spr = api_gp(menu_id, "progress_bar_sprite")
   
   -- draw arrow "progress" block then cover up with arrow hole
@@ -1624,6 +1885,83 @@ api_define_item({
 
 -- give the player the item
 api_give_item("sample_mod_cool_axe", 1)
+</syntaxhighlight><br/>
+      <h2>api_define_item_stats()</h2>
+      <p>This allows you to define the default stats that an item will spawn with when created, like how canisters or bees always have a default set of stats.</p>
+      {| class="wikitable"
+      ! Parameter !! Datatype !! Description 
+      |-
+      | oid || {{D|i=string}} || the oid of the item to define default stats for (see [[OID Reference]])
+      |-
+      | stats || {{D|i=table}} || the stats to give to an item when created if it has the given oid
+     |}
+     <p>This method won't return anything as it's just assigning a value to a key.</p>
+     <p>Example code to define a new super cool axe and give it default custom stats to use later:</p>
+<syntaxhighlight lang="lua">
+-- define an item
+api_define_item({
+  id = "cool_axe",
+  name = "Cool Axe",
+  category = "Decoration",
+  tooltip = "This is a cool axe!",
+  durability = 1000,
+  singular = true
+}, "sprites/cool_axe.png")
+
+-- set default stats
+api_define_item_stats("sample_mod_cool_axe", { awesomeness = 10 })
+
+-- give the player the item
+api_give_item("sample_mod_cool_axe", 1)
+
+-- you could then read the "stats" off of the item (or slot when picked up) to read back the "awesomeness" value
+</syntaxhighlight><br/>
+      <h2>api_define_liquid()</h2>
+      <p>As you may have already found out by messing around with canisters, you can technically change the "type" to be any value you want, however the canister will only render an unknown white liquid.<br/>This method allows you to properly define the color and texture to use for a liquid, and make the game register it properly in barrels/canisters and your own custom tanks (you can see example sprites in the Sample Mod)<br/><b>Note: Custom liquids cannot be used in the Bottler.</b></p>
+      {| class="wikitable"
+      ! Parameter !! Datatype !! Description 
+      |-
+      | name || {{D|i=string}} || the name of the liquid to use, this will be shown in tooltips and be set as the liquid "type" in stats
+      |-
+      | color || {{D|i=string}} || a color name to use for the liquid, this can be a default one or your own that you defined with {{F|i=api_define_color()}}
+      |-
+      | texture_sprite || {{D|i=string}} || the path to a single 37x34px image used as the liquid "texture". This will be drawn at 50% alpha on top of any tanks with your liquid in it, to help identify your liquid without color
+      |-
+      | preview_sprite || {{D|i=string}} || the path to a single 12x12px image used as the liquid preview when hovering over machines with a tank containing your liquid - this should be a solid filled in image (i.e. your color + your texture combined)
+     |}
+     <p>If this method worked it will return {{I|i=Success}}, otherwise if it fails it will return {{D|i=nil}} and will log an error in the Modding Console with one of the following errors:</p>
+     {| class="wikitable"
+     ! Error !! Description 
+     |-
+     | Liquid Already Defined || a liquid with your given "name" is already defined
+     |-
+     | Color Not Defined || the color name given is either not a default color or not a defined color
+     |-
+     | Texture Sprite Not Found || path to sprite given was not found
+     |-
+     | Preview Sprite Not Found || path to sprite given was not found
+    |}
+     <p>Example code to define a "coffee" liquid and spawn a canister containing that liquid:</p>
+<syntaxhighlight lang="lua">
+-- define a new liquid and give it a color/texture
+api_define_liquid(
+  "Coffee", 
+  "FONT_GREEN", 
+  "sprites/liquid_texture.png",
+  "sprites/liquid_preview.png" 
+)
+
+-- spawn a canister near the player with some coffee in it
+-- if you defined everything correctly you'll be able to put this canister in a barrel or your own custom menu tank
+-- and see the tank fill with the correct color / texture and show the right name in the tooltip
+player_pos = api_get_player_position()
+canister = api_create_item("canister1", 0, player_pos["x"] + 32, player_pos["y"] + 32)
+stats = api_gp(canister, "stats")
+stats["type"] = "Coffee"
+stats["amount"] = 400
+api_sp(canister, "stats", stats)
+
+-- profit?
 </syntaxhighlight><br/>
       <h2>api_define_menu_object()</h2>
       <p>This let's you define a new menu object. Menu objects are similar to objects but can be clicked to open a menu - a good example in-game would be a sawbench or a crate. They can be also given logic to run all the time so are a powerful tool for your mods.<br/>When you define a menu object the object oid will be the id you give prepended with your mod name, i.e. {{I|i=sample_mod_my_menu_object}}.<br/>When you define a menu object you also can provide 4 scripts that allow you to run all the fun stuff. These are defined in the {{D|i=scripts}} you pass in and need to be functions in your mod file. You can also set what values need to be saved from the menu to be loaded when the player reloads the game. See the example further below for more details.</p>
@@ -1995,6 +2333,8 @@ end
       | page1 || list({{D|i=quest_line}}) || the lines for the left-hand side quest page
       |-
       | page2 || list({{D|i=quest_definition}}) || the lines for the right-hand side quest page
+      |-
+      | claim_script || {{D|i=string}} || [Optional] call a script when the quest is completed
      |}
      <p>If this method worked it will return {{I|i=Success}}, otherwise if it fails it will return {{D|i=nil}} and will log an error in the Modding Console with one of the following errors:</p>
      {| class="wikitable"
@@ -2036,13 +2376,13 @@ quest_page2 = {
 api_define_quest(quest_def, quest_page1, quest_page2)
 </syntaxhighlight><br/>
       <h2>api_define_recipe()</h2>
-      <p>This method allows you to define a new recipe for the workbench for a specific tab. There's only so much space in the workbench so maybe you'll have to create your own special workbench? ;)</p>
+      <p>This method allows you to define a new recipe for the Mod Workbench for a specific tab. Each mod has it's own section in the Mod Workbench, meaning you can define up to 100 recipes (20 recipes per 5 tabs).<br/>You can use {{F|i=api_define_workbench()}} to define the tab names for your mod.</p>
       {| class="wikitable"
       ! Parameter !! Datatype !! Description 
       |-
-      | tab || {{D|i=string}} || the tab in the workbench that this recipe will be shown in, options are {{I|i=crafting}}, {{I|i=tools}}, {{I|i=beekeeping}}, {{I|i=decoration}}, and {{I|i=painting}}
+      | tab || {{D|i=string}} || the tab in the workbench that this recipe will be shown in, options are {{I|i=t1}}, {{I|i=t2}}, {{I|i=t3}}, {{I|i=t4}}, and {{I|i=t5}}
       |-
-      | item || {{D|i=string}} || the item oid that you want this recipe to be for
+      | item || {{D|i=string}} || the item oid that you want this recipe to be for (see [[OID Reference]])
       |-
       | recipe || {{D|i=recipe}} || a recipe definition you want to use
       |-
@@ -2064,11 +2404,11 @@ recipe = {
   { item = "mead", amount = 999 }
 }
 
--- add the recipe to the workbench so that it crafts an "npc1" item (Skipper)
-res = api_define_recipe("crafting", "npc1", recipe, 1)
+-- add the recipe to the mod workbench so that it crafts an "npc1" item (Skipper)
+res = api_define_recipe("t1", "npc1", recipe, 1)
 </syntaxhighlight><br/>
       <h2>api_define_sprite()</h2>
-      <p>This method allows you to define a custom sprite which you can then use in draw calls later. You can add any image you want but try not to add huge images as it can take longer to add your sprite to all the texture pages.<br/>Whatever name you provide will be prepended with "sp_", i.e. {{I|i=sp_my_sprite_name}}<br/><b>For all sprites, GameMaker will use the bottom left pixel as the "transparent" pixel!</b></p>
+      <p>This method allows you to define a custom sprite which you can then use in draw calls later. You can add any image you want but try not to add huge images as it can take longer to add your sprite to all the texture pages.<br/>Whatever name you provide will be prepended with "sp_", i.e. {{I|i=sp_my_mod_sprite_name}}.<br/><b>For all sprites, GameMaker will use the bottom left pixel as the "transparent" pixel!</b><br/><b>All sprite names are global across mods so it's recommended to use your mod_id in the name provided.</b></p>
       {| class="wikitable"
       ! Parameter !! Datatype !! Description 
       |-
@@ -2096,7 +2436,7 @@ rot = 0
 
 -- define a sprite in the init hook()
 function init() 
-  spr_bee = api_define_sprite("sus_bee", "sprites/sus-bee.png", 1)
+  spr_bee = api_define_sprite("sample_mod_sus_bee", "sprites/sus-bee.png", 1)
   return "Success"
 end
 
@@ -2337,12 +2677,220 @@ function init()
   return "Success"
 
 end
+</syntaxhighlight><br/>
+      <h2>api_define_window()</h2>
+      <p>This method allows you to define your own custom window that can be placed on walls.<br/>A window could be literally anything, as it's just an item that when placed on a wall will have a special frame drawn, so you could use this to make lights, shelves, banners etc.</p>
+      {| class="wikitable"
+      ! Parameter !! Datatype !! Description 
+      |-
+      | window || {{D|i=window_definition}} || definition for your new window
+      |-
+      | window_sprite || {{D|i=string}} || the spritesheet for the new window, should be 5 frames (16x16), the first 4 like a normal item/obj sprite, the 5th frame is what will be drawn onto the wall when placed down
+     |}
+     <p>If this method worked it will return {{I|i=Success}}, otherwise if it fails it will return {{D|i=nil}} and will log an error in the Modding Console with one of the following errors:</p>
+     {| class="wikitable"
+     ! Error !! Description 
+     |-
+     | Missing Required Key || Your definition is missing either "id" or "name"
+     |-
+     | Window ID Already Defined || There is already a window defined with this ID, use a different one or check you haven't defined twice
+     |-
+     | Window Sprite Not Found || Couldn't resolve the path to the sprite specified
+     |-
+     | Failed To Define Wall || Generic catch all, see the error message for clues
+    |}
+     <p>Example code to add a shiny custom wall:</p>
+<syntaxhighlight lang="lua">
+-- setup the trait
+function init() 
+
+  -- define a basic window
+  api_define_wall({
+    id = 69,
+    name = "Bee Banner" 
+  }, "/sprites/banner_sprite.png")
+
+  return "Success"
+
+end
+</syntaxhighlight><br/>
+      <h2>api_define_workbench()</h2>
+      <p>This method allows you to define a custom label for your mod to be shown in the Mod Workbench, along with custom labels for the tabs for your mod (shown when hovered).<br/>If not specified the Mod Workbench will show your mod_id, and tabs will just be labelled "Tab 1", "Tab 2" etc.<br/><b>The labels you give do not affect the tab parameter in {{F|i=api_define_recipe()}} which will still always use "t1", "t2", etc</b></p>
+      {| class="wikitable"
+      ! Parameter !! Datatype !! Description 
+      |-
+      | label || {{D|i=string}} || label to show for your mod in the Mod Workbench
+      |-
+      | tabs || {{D|i=table}} || a table with 5 keys, "t1", "t2", "t3", "t4", "t5". each key should have a string value that will be displayed when that tab is hovered.
+     |}
+     <p>If this method worked it will return {{I|i=Success}}, otherwise god knows how you messed that up!</p>
+     <p>Example code to set the tabs for our mod:</p>
+<syntaxhighlight lang="lua">
+-- setup the trait
+function init() 
+
+  -- define name + tabs for our mod in the Mod Workbench
+  api_define_workbench("Some Crap", {
+    t1 = "Stuff",
+    t2 = "Bits",
+    t3 = "Crap",
+    t4 = "Junk",
+    t5 = "Dust"
+  })
+
+end
+</syntaxhighlight>
+    </div>
+  </div><br/>
+  
+  <div class="aw-api-section mw-customcollapsible-s1">
+    <h1>[[File:Sign_Item.png|32px]]Describe Methods</h1>
+    <p>Describe methods allow you to get specific metadata about the game, both from base game and from mods.</p>
+    {| class="wikitable"
+     ! Method !! Description 
+     |-
+     | {{F|i=api_describe_bees()}} || returns a list of all bees defined from either the base game or all mods
+     |-
+     | {{F|i=api_describe_commands()}} || returns a list of all commands defined from either the base game or all mods
+     |-
+     | {{F|i=api_describe_dictionary()}} || returns the entire dictionary for either the base game or all mods
+     |-
+     | {{F|i=api_describe_mods()}} || returns a list of all mod_id's loaded
+     |-
+     | {{F|i=api_describe_oids()}} || returns a list of all oids defined from either the base game or all mods
+     |-
+     | {{F|i=api_describe_recipes()}} || returns a list of all crafting recipes defined from either the base game or all mods
+    |}
+    <div class="mw-collapsible mw-collapsed" id="mw-customcollapsible-s1">
+      <h2>api_describe_bees()</h2>
+      <p>This method returns all the bee definitions for either the base game or for all mods loaded.<b>The bee definitions are also a heckin' BIG table, so I wouldn't try api_log()ing it lol</b></p>
+      {| class="wikitable"
+      ! Parameter !! Datatype !! Description 
+      |-
+      | mods || {{D|i=boolean}} || if true will return results for mods instead of the base game
+     |}
+     <p>If the "mods" parameter is false, this method will return a table containing all the bee definitions for the base game, with a key for each bee species (i.e. "common"). See your "bees.json" file for the sorts of values on these definition tables.<br/>If true, this method will return a table with a key for each mod_id loaded, and then have the mods own bee definitions underneath that.</p>
+     <p>Example code to get some specific oid definitions from dictionaries:</p>
+<syntaxhighlight lang="lua">
+-- get a base game bee definition
+game_dictionary = api_describe_bees(false)
+common_definition = game_dictionary["common"]
+api_log("common details!", common_definition)
+
+-- get a mod bee definition
+my_mod = "sample_mod"
+mod_dictionary = api_describe_bees(true)
+my_mod_dictionary = mod_dictionary[my_mod]
+my_bee_definition = my_mod_dictionary["nightcrawler"]
+api_log("nightcrawler details!", my_bee_definition)
+</syntaxhighlight><br/>
+      <h2>api_describe_commands()</h2>
+      <p>This method returns all the commands usable in-game for either the base game or for all mods loaded.</p>
+      {| class="wikitable"
+      ! Parameter !! Datatype !! Description 
+      |-
+      | mods || {{D|i=boolean}} || if true will return results for mods instead of the base game
+     |}
+     <p>If the "mods" parameter is false, this method will return a list of {{D|i=string}}s for each command, i.e. "/gimme".<br/>If true, this method will return a table with a key for each mod_id loaded, and then have list of commands under each mod key.</p>
+     <p>Example code to get some specific oid definitions from dictionaries:</p>
+<syntaxhighlight lang="lua">
+-- log all base game commands
+game_commands = api_describe_commands(false)
+api_log("game commands!", game_commands)
+
+-- log all mod commands
+my_mod = "sample_mod"
+mod_commands = api_describe_commands(true)
+my_mod_commands = mod_commands[my_mod]
+api_log("mod commands!", my_mod_commands)
+</syntaxhighlight><br/>
+      <h2>api_describe_dictionary()</h2>
+      <p>This method returns the entire dictionary for either the base game or for all mods loaded.<b>The dictionary is a heckin' BIG table, so I wouldn't try api_log()ing it lol</b></p>
+      {| class="wikitable"
+      ! Parameter !! Datatype !! Description 
+      |-
+      | mods || {{D|i=boolean}} || if true will return results for mods instead of the base game
+     |}
+     <p>If the "mods" parameter is false, this method will return a table containing the entire dictionary for the base game, with a key for each oid. See your "dictionary.json" file for the sorts of values on these dictionary tables.<br/>If true, this method will return a table with a key for each mod_id loaded, and then have the mods own dictionary underneath that.</p>
+     <p>Example code to get some specific oid definitions from dictionaries:</p>
+<syntaxhighlight lang="lua">
+-- get a base game item definition
+game_dictionary = api_describe_dictionary(false)
+axe_definition = game_dictionary["axe1"]
+api_log("axe details!", axe_definition)
+
+-- get a mod item definition
+my_mod = "sample_mod"
+mod_dictionary = api_describe_dictionary(true)
+my_mod_dictionary = mod_dictionary[my_mod]
+my_axe_definition = my_mod_dictionary["sample_mod_cool_axe"]
+api_log("mod axe details!", my_axe_definition)
+</syntaxhighlight><br/>
+      <h2>api_describe_mods()</h2>
+      <p>This method returns a list of mod_id's for all the mods currently load.</p>
+      {| class="wikitable"
+      ! Parameter !! Datatype !! Description 
+      |-
+      | oid || {{D|i=string}} || filter results to a specific oid (ideally you should always provide a filter) (see [[OID Reference]])
+     |}
+     <p>This method will return a list of {{D|i=string}}s for each mod loaded.</p>
+     <p>Example code to get all mods the user currently has:</p>
+<syntaxhighlight lang="lua">
+-- get mods
+all_mods = api_describe_mods()
+has_mod = false
+for i=1,#all_mods do
+  if all_mods[i] == "my_mod" then
+    has_mod = true
+  end
+end
+</syntaxhighlight><br/>
+      <h2>api_describe_oids()</h2>
+      <p>This method returns a list of oids defined for either the base game or for all mods loaded (see [[OID Reference]]).</p>
+      {| class="wikitable"
+      ! Parameter !! Datatype !! Description 
+      |-
+      | mods || {{D|i=boolean}} || if true will return results for mods instead of the base game
+     |}
+     <p>If the "mods" parameter is false, this method will return a list of {{D|i=string}}s for each oid in the base game.<br/>If true, this method will return a table with a key for each mod_id loaded, with a list of {{D|i=strings}}s for each of the mods' oids underneath it.</p>
+     <p>Example code to get some oids:</p>
+<syntaxhighlight lang="lua">
+-- base game oids
+all_oids = api_describe_oids(false)
+
+-- random mod oids
+my_mod = "sample_mod"
+mod_oids = api_describe_oids(true)
+my_mod_oids = mod_oids[my_mod]
+api_log("my_mod_oids", my_mod_oids)
+</syntaxhighlight><br/>
+      <h2>api_describe_recipes()</h2>
+      <p>This method returns all the crafting recipes in either the base game or for all mods loaded.</p>
+      {| class="wikitable"
+      ! Parameter !! Datatype !! Description 
+      |-
+      | mods || {{D|i=boolean}} || if true will return results for mods instead of the base game
+     |}
+     <p>If the "mods" parameter is false, this method will return a table for each recipe category (see {{F|i=api_define_recipe()}}), with a list of {{D|i=recipe}} under each one.<br/>If true, this method will return a table with a key for each mod_id loaded, and then have the recipe categories under each mod key (with the recipe lists under those).</p>
+     <p>Example code to get some specific oid definitions from dictionaries:</p>
+<syntaxhighlight lang="lua">
+-- get a base game recipe
+game_recipes = api_describe_recipes(false)
+first_crafting = game_recipes["crafting"][1]
+api_log("first crafting recipe!", first_crafting)
+
+-- get a mod recipe
+my_mod = "sample_mod"
+mod_recipes = api_describe_recipes(true)
+my_mod_recipes = mod_recipes[my_mod]
+my_mod_crafting = my_mod_recipes["crafting"]
+api_log("mod crafting recipes!", my_mod_crafting)
 </syntaxhighlight>
     </div>
   </div><br/>
 
   <div class="aw-api-section mw-customcollapsible-s1">
-    <h1>[[File:Sign_Item.png|32px]]Draw Methods</h1>
+    <h1>[[File:Pencil_Item.png|32px]]Draw Methods</h1>
     <p>Draw methods let you draw sprites or primitives. These methods will only work in the draw script of a menu object (defined in {{F|i=api_define_menu_object()}}), in the {{H|i=draw()}} hook or in the {{H|i=gui()}} hook<br/>It's worth noting that due to the small scale resolution of APICO any primitives you draw will be aligned with the pixel grid.</p>
     {| class="wikitable"
      ! Method !! Description 
@@ -2677,6 +3225,8 @@ end
      |-
      | {{F|i=api_get_key_pressed()}} || returns if a key is currently being pressed
      |-
+     | {{F|i=api_get_language()}} || returns the current player's selected language, i.e. "en"
+     |-
      | {{F|i=api_get_menu_objects()}} || returns a list of {{D|i=instance}}s for all active menu objects, both onscreen and "working" offscreen
      |-
      | {{F|i=api_get_menus_obj()}} || returns the menu object inst for a given menu inst
@@ -2760,7 +3310,7 @@ function data(ev, data)
 end
 </syntaxhighlight><br/>
       <h2>api_get_definition()</h2>
-      <p>This method lets you get the definition for a given oid from the dictionary based on a given oid.</p>
+      <p>This method lets you get the definition for a given oid from the dictionary based on a given oid.<br/>See your "dictionary.json" file for the sorts of values on these dictionary tables.</p>
       {| class="wikitable"
       ! Parameter !! Datatype !! Description 
       |-
@@ -3044,6 +3594,16 @@ if key_pressed == 1 then
   api_create_log("key_pressed", "F's in chat")
 end
 </syntaxhighlight><br/>
+      <h2>api_get_language()</h2>
+      <p>This method returns the current player's language selection as a 2-digit language code, i.e. "en".</p>
+     <p>This method returns the current language code, which can be one of the following: {{I|i=en}}, {{I|i=fr}}, {{I|i=it}}, {{I|i=de}}, {{I|i=es}}, {{I|i=br}}, or {{I|i=jp}}.</p>
+     <p>Example code to see if the current language is German:</p>
+<syntaxhighlight lang="lua">
+current_lan = api_get_language()
+if current_lan == "de" then
+  -- hallo!
+end
+</syntaxhighlight><br/>
       <h2>api_get_menu_objects()</h2>
       <p>This method gets a list of all menu objects either onscreen or "working". All menu objects have a working property, usually set by activity (a queen for Beehives, or logs in a Sawmill) - while working these objects stay active.</p>
       {| class="wikitable"
@@ -3051,7 +3611,7 @@ end
       |-
       | radius || {{D|i=integer}} || [Optional] if specified this method will get all objects within this radius from the player, rather than get all onscreen
       |-
-      | oid || {{D|i=string}} || [Optional] if specified this method will only return objs with a matching oid
+      | oid || {{D|i=string}} || [Optional] if specified this method will only return objs with a matching oid (see [[OID Reference]])
       |-
       | coordinate || {{D|i=coordinate}} || [Optional] if using a radius, this allows you specify the center point to use. If not given, will default to the player
      |}
@@ -3122,7 +3682,7 @@ end
       |-
       | radius || {{D|i=integer}} || [Optional] if specified this method will get all objects within this radius from the player, rather than get all onscreen
       |-
-      | oid || {{D|i=string}} || [Optional] if specified this method will only return objs with a matching oid
+      | oid || {{D|i=string}} || [Optional] if specified this method will only return objs with a matching oid (see [[OID Reference]])
       |-
       | coordinate || {{D|i=coordinate}} || [Optional] if using a radius, this allows you specify the center point to use. If not given, will default to the player
      |}
@@ -3253,21 +3813,25 @@ end
       | menu_id || {{D|i=integer}} || menu instance to get a slot from
      |}
      <p>This method will return a list of {{D|i=slot_instance}} if a valid menu object, otherwise it will return {{D|i=nil}}</p>
-     <p>Example code to get all of the player slots and fill them with logs:</p>
+     <p>Example code to get all of the player slots and fill them with logs, then set the first slot to be a bee:</p>
 <syntaxhighlight lang="lua">
 -- get player slots
 slots = api_get_slots(api_get_player_instance())
 
+-- set all slots to be filled with logs (you're welcome)
 for i=1,30 do
   api_slot_set(slots[i]["id"], "log", 99)
 end
+
+-- set first slot to be a common bee
+api_slot_set(slots[1]["id"], "bee", 0, api_create_bee_stats("common", false))
 </syntaxhighlight><br/>
       <h2>api_get_sprite()</h2>
-      <p>This method will return a sprite id for a given oid. This can be for an item/object you have defined, a sprite you have defined, or for a standard game oid.<br/>You need to prepend the oid with "sp_", for example {{I|i=sp_axe1}}.</p>
+      <p>This method will return a sprite id for a given oid. This can be for an item/object you have defined, a sprite you have defined, or for a standard game oid.<br/>You need to prepend the oid with "sp_", for example {{I|i=sp_axe1}}.<br/><b>You can get bee sprites with by using the following format: {{I|i=sp_bee_common}}</b></p>
       {| class="wikitable"
       ! Parameter !! Datatype !! Description 
       |-
-      | oid || {{D|i=string}} || sprite to get the reference for
+      | oid || {{D|i=string}} || sprite to get the reference for (see [[OID Reference]])
      |}
      <p>This method will return a {{D|i=integer}} for the sprite id if found otherwise it will return {{D|i=nil}}</p>
      <p>Example code to get the common bee sprite and draw with it:</p>
@@ -3409,6 +3973,8 @@ api_give_money(420)
      |-
      | {{F|i=api_random_range()}} || returns a random number between a range or X-Y, where X and Y are given
      |-
+     | {{F|i=api_refresh_tooltip()}} || refreshes the tooltip cache to update with new values (if any)
+     |-
      | {{F|i=api_remove_gui()}} || removes a menu gui instance made with {{F|i=api_define_gui()}}
      |-
      | {{F|i=api_toggle_menu()}} || toggles a menu instance to be open or closed
@@ -3437,7 +4003,7 @@ api_add_slot_to_menu(player_slots[1]["id"], MY_OTHER_MENU_ID)
       {| class="wikitable"
        ! Parameter !! Datatype !! Description 
        |-
-       | oid || {{D|i=string}} || the object oid you want to blacklist from input, should be a menu_object oid
+       | oid || {{D|i=string}} || the object oid you want to blacklist from input, should be a menu_object oid (see [[OID Reference]])
       |}
       <p>Example code to blacklist input on a custom defined menu object:</p>
 <syntaxhighlight lang="lua">
@@ -3448,7 +4014,7 @@ api_blacklist_input("custom_sign")
       {| class="wikitable"
        ! Parameter !! Datatype !! Description 
        |-
-       | oid || {{D|i=string}} || the item oid you want to check discovery for
+       | oid || {{D|i=string}} || the item oid you want to check discovery for (see [[OID Reference]])
       |}
       <p>This method will return a {{D|i=boolean}} based on whether the item is discovered or not.</p>
       <p>Example code to check the discovery of a few items:</p>
@@ -3624,6 +4190,16 @@ random_number = api_random(9)
 <syntaxhighlight lang="lua">
 -- get a random number between 5 and 10
 random_number = api_random_range(5, 10)
+</syntaxhighlight><br/>
+      <h2>api_refresh_tooltip()</h2>
+      <p>Tooltips get cached and don't update unless the mouse moves onto something new, which can be a problem with directly changing slot or object values.<br/>Calling this method will reset the cache and make a new tooltip.</p>
+      <p>Example code to refresh the tooltip after a click:</p>
+<syntaxhighlight lang="lua">
+function click()
+
+  api_refresh_tooltip()
+
+end
 </syntaxhighlight><br/>
       <h2>api_remove_gui()</h2>
       <p>This destroys a GUI instance created with {{F|i=api_define_gui()}}. This is seperate to {{F|i=api_destroy_inst}} because we need to dereference the "gui_key" off of the menu that you defined the GUI on in the first place.</p>
@@ -4053,7 +4629,7 @@ api_set_menu_position(menu_id, cam["x"], cam["y"])
        |-
        | notification_type || {{D|i=string}} || a notification type, either your own or one of the standard types: {{I|i=workbench}}, {{I|i=quest}}, {{I|i=bees}}, {{I|i=microscope}}, {{I|i=flowers}}, {{I|i=weather}}, {{I|i=altar}}, {{I|i=buff}}, {{I|i=mag}}, {{I|i=notice}}
        |-
-       | item_oid || {{D|i=string}} || the item oid to show in the notification icon
+       | item_oid || {{D|i=string}} || the item oid to show in the notification icon (see [[OID Reference]])
        |-
        | title || {{D|i=string}} || the title to show in the notification
        |-
@@ -4388,7 +4964,7 @@ slots = api_get_slots(api_get_player_instance())
 api_slot_decr(slots[2]["id"], 2)
 </syntaxhighlight><br/>
       <h2>api_slot_item_id()</h2>
-      <p>If you've ever dug around in the dictionary you've probably seen stuff like "bee:common" or "frame:filled". For some items we have some stat properties that are pretty important for game function, and we use these special "data" ids to represent that.<br/><br/>This method returns the slots current item as a data id, if applicable. This will not work with custom stats, any other item not a frame or a bee will just return the item OID.<br/>This is probably more useful for bee-related stuff, as it saves you having to query the stats for a slot to find out the dominent species.</p>
+      <p><b>If you want to get the type of bee in a slot and have the slot instance already just look at the slot's {{D|i=stats}} property! This method is intended for situations where you have only have slot ID, and not the slot instance from say {{F|i=api_get_slot()}}.</b><br/>If you've ever dug around in the dictionary you've probably seen stuff like "bee:common" or "frame:filled". For some items we have some stat properties that are pretty important for game function, and we use these special "data id"s to represent that.<br/><br/>This method returns the slots current item as a data id, if applicable, saving you having to get the slot instance and read off it's stats prop.</p>
       {| class="wikitable"
        ! Parameter !! Datatype !! Description 
        |-
@@ -4438,7 +5014,7 @@ empty_slots = api_slot_match(player_id, {""})
        |-
        | menu_id || {{D|i=integer}} || the menu instance you want to find matches on
        |-
-       | match || list({{D|i=string}}) || a list of item values you want to match on, can be an item oid, "ANY" (for any item), or "" for blank
+       | match || list({{D|i=string}}) || a list of item values you want to match on, can be an item oid, "ANY" (for any item), or "" for blank (see [[OID Reference]])
        |-
        | range || list({{D|i=integer}}) || a list of slot indexes to check. Indices start at 1 like LUA lists do
        |-
@@ -4463,7 +5039,7 @@ empty_slots = api_slot_match(player_id, {"ALL"}, {5, 6, 7, 8})
        |-
        | slot_id || {{D|i=integer}} || the slot id of the slot instance you want to set
        |-
-       | item_oid || {{D|i=string}} || the item oid you want to set in the slot
+       | item_oid || {{D|i=string}} || the item oid you want to set in the slot (see [[OID Reference]])
        |-
        | amount || {{D|i=integer}} || the amount of the item you want to set. If setting a singular item this will be ignored
        |-
@@ -4560,7 +5136,7 @@ end
        |-
        | slot_id || {{D|i=integer}} || the slot id of the slot instance you want to validate agaisnt
        |-
-       | item || {{D|i=string}} || the item oid you want to put in the slot, i.e. "axe4"
+       | item || {{D|i=string}} || the item oid you want to put in the slot, i.e. "axe4" (see [[OID Reference]])
        |-
        | stats || {{D|i=table}} || the stats for the item you want to put in the slot, can be an empty table if no stats needed
       |}
@@ -4633,7 +5209,7 @@ api_take_money(69)
       {| class="wikitable"
        ! Parameter !! Datatype !! Description 
        |-
-       | item_oid || {{D|i=string}} || the item to use up
+       | item_oid || {{D|i=string}} || the item to use up (see [[OID Reference]])
        |-
        | amount || {{D|i=integer}} || the amount to use up
       |}
@@ -4652,7 +5228,7 @@ end
       {| class="wikitable"
        ! Parameter !! Datatype !! Description 
        |-
-       | item_oid || {{D|i=string}} || the item to use up
+       | item_oid || {{D|i=string}} || the item to use up (see [[OID Reference]])
       |}
       <p>This method returns an {{D|i=integer}} for the amount of the given item available.</p>
       <p>Example code to check for an amount of planks and give the player more planks if under a certain amount:</p>
